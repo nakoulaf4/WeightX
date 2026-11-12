@@ -1,0 +1,79 @@
+{
+  "model_id": "smollm2-135m",
+  "hf_repo_id": "HuggingFaceTB/SmolLM2-135M",
+  "total_params": 134515072,
+  "changed_params": 3538943,
+  "changed_fraction": 0.026309,
+  "edited_tensors": [
+    "model.layers.13.mlp.down_proj.weight",
+    "model.layers.17.mlp.down_proj.weight",
+    "model.layers.22.mlp.down_proj.weight",
+    "model.layers.26.mlp.down_proj.weight"
+  ],
+  "before": {
+    "held_out_ppl": 317.931,
+    "held_out_top1": 0.2524,
+    "control_ppl": 13.7962,
+    "control_top1": 0.4727
+  },
+  "after": {
+    "held_out_ppl": 85.8301,
+    "held_out_top1": 0.3524,
+    "control_ppl": 13.2917,
+    "control_top1": 0.4788
+  },
+  "held_out_ppl_reduction_pct": 73.0,
+  "control_ppl_change_pct": -3.66,
+  "vespasian_verdicts": [
+    "ACCEPTED & COMMITTED: held-out score improved 0.00473 -> 0.00749 (+0.00276), KL drift=0.0002 <= 0.05",
+    "ACCEPTED & COMMITTED: held-out score improved 0.00749 -> 0.01131 (+0.00382), KL drift=0.0008 <= 0.05",
+    "ACCEPTED & COMMITTED: held-out score improved 0.01131 -> 0.01516 (+0.00385), KL drift=0.0019 <= 0.05"
+  ],
+  "calibration": {
+    "steps": [
+      {
+        "iteration": 1,
+        "layers": [
+          "model.layers.13.mlp.down_proj.weight",
+          "model.layers.17.mlp.down_proj.weight",
+          "model.layers.22.mlp.down_proj.weight",
+          "model.layers.26.mlp.down_proj.weight"
+        ],
+        "chosen_rel_step": 0.075,
+        "practice_nll_before": 5.54431,
+        "practice_nll_after": 3.83437,
+        "control_nll_before": 2.62439,
+        "control_nll_after": 2.61352
+      },
+      {
+        "iteration": 2,
+        "layers": [
+          "model.layers.13.mlp.down_proj.weight",
+          "model.layers.17.mlp.down_proj.weight",
+          "model.layers.22.mlp.down_proj.weight",
+          "model.layers.26.mlp.down_proj.weight"
+        ],
+        "chosen_rel_step": 0.075,
+        "practice_nll_before": 3.83437,
+        "practice_nll_after": 2.48253,
+        "control_nll_before": 2.61352,
+        "control_nll_after": 2.60035
+      },
+      {
+        "iteration": 3,
+        "layers": [
+          "model.layers.13.mlp.down_proj.weight",
+          "model.layers.17.mlp.down_proj.weight",
+          "model.layers.22.mlp.down_proj.weight",
+          "model.layers.26.mlp.down_proj.weight"
+        ],
+        "chosen_rel_step": 0.075,
+        "practice_nll_before": 2.48253,
+        "practice_nll_after": 1.47652,
+        "control_nll_before": 2.60035,
+        "control_nll_after": 2.58714
+      }
+    ]
+  },
+  "saved_checkpoint_path": "C:\\Users\\runbo\\Downloads\\WeightX\\checkpoints\\smollm2-135m_weightx_improved.safetensors"
+}

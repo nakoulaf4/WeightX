@@ -1,0 +1,67 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "weightx"
+version = "0.3.0"
+description = "Open-source (GPLv3) Weight-Space Programming harness (DSH-style Desktop + wx/weightx CLI) for safe, declarative, and verified LLM weight surgery."
+readme = "README.md"
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+authors = [
+    { name = "WeightX Contributors" }
+]
+keywords = [
+    "weight-space-programming",
+    "llm",
+    "model-editing",
+    "mechanistic-interpretability",
+    "tensor-surgery",
+    "memit",
+    "fisher-information",
+    "toon",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "numpy>=1.24",
+    "torch>=2.1",
+    "safetensors>=0.4",
+    "pyyaml>=6.0",
+    "httpx>=0.25",
+    "pydantic>=2.5",
+]
+
+[project.optional-dependencies]
+integrations = [
+    "omnia-surgery>=0.11.0",
+    "uni-layer>=0.7.0",
+    "weightspace>=0.3.0",
+    "toon-format>=1.2.0",
+    "transformers>=4.40",
+]
+dev = [
+    "pytest>=8.0",
+]
+
+[project.scripts]
+weightx = "weightx.cli:main"
+wx = "weightx.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = [".", "src"]

@@ -1,0 +1,19 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Example BrainSurgery-WX Declarative YAML Surgery Plan for WeightX
+transforms:
+  - assert:
+      all:
+        - exists: { of: "model.layers.2.mlp.down_proj.weight" }
+        - shape: { of: "model.layers.2.mlp.down_proj.weight", is: [64, 172] }
+        - dtype: { of: "model.layers.2.mlp.down_proj.weight", is: "float32" }
+        - finite: { of: "model.layers.2.mlp.down_proj.weight" }
+
+  - rescale_outlier_rows_:
+      target: "model.layers.2.mlp.down_proj.weight"
+      min_ratio: 2.5
+
+  - assert:
+      all:
+        - finite: { of: "model.layers.2.mlp.down_proj.weight" }
+        - norm: { of: "model.layers.2.mlp.down_proj.weight", ord: "l2", le: 50.0 }
+        - rel_delta: { of: "model.layers.2.mlp.down_proj.weight", le: 0.95 }

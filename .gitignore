@@ -1,0 +1,17 @@
+# Virtual environments & Python caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+*.egg-info/
+src/*.egg-info/
+build/
+dist/
+
+# Large intermediate checkpoints (keep benchmark JSON reports)
+checkpoints/*.safetensors
+models/*.safetensors
+*.pt
+*.bin

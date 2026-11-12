@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <rect x="14" y="14" width="228" height="228" rx="58" fill="#1B1B1C" stroke="#353638" stroke-width="3"/>
+  <!-- Subtle outer W tensor links -->
+  <line x1="62" y1="72" x2="95" y2="184" stroke="#878D96" stroke-width="9" stroke-linecap="round"/>
+  <line x1="194" y1="72" x2="161" y2="184" stroke="#878D96" stroke-width="9" stroke-linecap="round"/>
+  <line x1="95" y1="184" x2="128" y2="128" stroke="#878D96" stroke-width="9" stroke-linecap="round"/>
+  <line x1="161" y1="184" x2="128" y2="128" stroke="#878D96" stroke-width="9" stroke-linecap="round"/>
+  <!-- Primary X weight-space diagonals -->
+  <line x1="62" y1="72" x2="161" y2="184" stroke="#F9FAFB" stroke-width="15" stroke-linecap="round"/>
+  <line x1="194" y1="72" x2="95" y2="184" stroke="#F9FAFB" stroke-width="15" stroke-linecap="round"/>
+  <!-- Tensor nodes -->
+  <circle cx="62" cy="72" r="11" fill="#F9FAFB"/>
+  <circle cx="194" cy="72" r="11" fill="#F9FAFB"/>
+  <circle cx="95" cy="184" r="11" fill="#F9FAFB"/>
+  <circle cx="161" cy="184" r="11" fill="#F9FAFB"/>
+  <!-- Central focal node -->
+  <circle cx="128" cy="128" r="21" fill="#1B1B1C"/>
+  <circle cx="128" cy="128" r="16" fill="#7AAAFF"/>
+</svg>
