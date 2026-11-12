@@ -7,8 +7,8 @@ Case-insensitive CLI & WSP Skill runner:
   - `wx` / `weightx` (any case: `wx`, `WX`, `Wx`, `weightx`, `WeightX`, `WEIGHTX`)
     launches the interactive DSH-styled WeightX TUI.
   - `wx desktop` / `wx gui`           : Launch WeightX Desktop app.
-  - `wx skills` / `wx prompts`        : List the 8 compact 2-word WSP skills and pipelines.
-  - `wx skill <name>` / `wx /<skill>` : Execute a multi-stage WSP skill pipeline directly.
+  - `wx skills`                       : List all 8 compact 2-word WSP skills and pipelines.
+  - `wx /skill <name>` / `wx skill`   : Execute a multi-stage WSP skill pipeline directly.
   - `wx catalog`                      : List all models in the WeightX Model Catalog (TOON).
   - `wx improve [model_id]`           : Run closed-form WeightX improvement pipeline on a small LLM.
   - `wx demo`                         : Run the full 5-stage WeightX MVP cycle on a causal Transformer LM.
@@ -29,12 +29,12 @@ from pathlib import Path
 import torch.nn as nn
 from safetensors.torch import load_file
 
-from weightx.catalog import CODEX_PROMPT_SUGGESTIONS, ModelCatalog
+from weightx.catalog import ModelCatalog
 from weightx.declarative.plan_engine import execute_yaml_plan
 from weightx.l1_arch.autoarch import inspect_architecture
 from weightx.l3_weights.workspace import WeightWorkspace
 from weightx.providers.cli_agent import CLIAgentProvider
-from weightx.skills import WSP_SKILLS, resolve_skill
+from weightx.skills import WSP_SKILLS, parse_skill_command, resolve_skill
 from weightx.tools.registry import build_default_tool_registry
 from weightx.toon_io import dumps_toon
 
@@ -78,19 +78,22 @@ def cmd_catalog() -> int:
     return 0
 
 
-def cmd_prompts() -> int:
+def cmd_skills() -> int:
     rows = [
         {
             "idx": i + 1,
-            "skill": f"/{sk.skill_id}",
+            "skill": f"/skill {sk.skill_id}",
             "pill": sk.pill_label,
             "pipeline": sk.pipeline_title,
             "stages": len(sk.stage_names),
         }
         for i, sk in enumerate(WSP_SKILLS)
     ]
-    print(dumps_toon({"weightx_skills": rows, "codex_prompt_suggestions": len(CODEX_PROMPT_SUGGESTIONS)}))
+    print(dumps_toon({"weightx_skills": rows, "total_skills": len(WSP_SKILLS)}))
     return 0
+
+
+cmd_prompts = cmd_skills
 
 
 def cmd_run_skill(skill_query: str, model_id: str = "minillama-demo") -> int:
@@ -98,7 +101,11 @@ def cmd_run_skill(skill_query: str, model_id: str = "minillama-demo") -> int:
 
     sk = resolve_skill(skill_query)
     if sk is None:
-        print(f"Неизвестный навык: {skill_query!r}. Доступные навыки: {[s.skill_id for s in WSP_SKILLS]}", file=sys.stderr)
+        print(
+            f"Неизвестный скилл: {skill_query!r}. "
+            f"Используйте `/skill <название>`: {[f'/skill {s.skill_id}' for s in WSP_SKILLS]}",
+            file=sys.stderr,
+        )
         return 1
     sess = StudioSession()
     sess.load_model(model_id)
@@ -172,11 +179,26 @@ def main(argv: list[str] | None = None) -> int:
                 raw_args[0] = first_low
             elif first_low in ("-h", "--help", "/?"):
                 raw_args[0] = "--help"
+            elif first_low == "/skills":
+                return cmd_skills()
             else:
-                # Check if first argument is a direct skill invocation (`/coding-boost`, `"Улучшить в кодинге"`, etc.)
-                sk = resolve_skill(" ".join(raw_args)) or resolve_skill(raw_args[0])
+                # Extract optional --model <id> when calling `wx /skill coding-boost --model tiny-gpt2`
+                model_override = "minillama-demo"
+                clean_tokens: list[str] = []
+                i = 0
+                while i < len(raw_args):
+                    if raw_args[i].lower() in ("--model", "-m") and i + 1 < len(raw_args):
+                        model_override = raw_args[i + 1]
+                        i += 2
+                        continue
+                    clean_tokens.append(raw_args[i])
+                    i += 1
+                joined = " ".join(clean_tokens)
+                sk, _rem, is_explicit_skill = parse_skill_command(joined)
+                if is_explicit_skill and sk is None:
+                    return cmd_skills()
                 if sk is not None:
-                    return cmd_run_skill(sk.skill_id)
+                    return cmd_run_skill(sk.skill_id, model_id=model_override)
 
     parser = argparse.ArgumentParser(
         prog="wx",
@@ -187,8 +209,8 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("agents", help="List supported API providers and detected CLI agents.")
     sub.add_parser("providers", help="Alias for `agents`: list supported API providers and CLI agents.")
     sub.add_parser("catalog", help="List all models in the WeightX Model Catalog.")
-    sub.add_parser("prompts", help="List ready-to-run WSP skill pills and pipelines.")
-    sub.add_parser("skills", help="List all 8 WSP skills and their multi-stage pipelines.")
+    sub.add_parser("skills", help="List all 8 WSP skills (`/skill <name>`) and their pipelines.")
+    sub.add_parser("prompts", help=argparse.SUPPRESS)
 
     p_skill = sub.add_parser("skill", help="Execute a WSP skill pipeline by ID or 2-word pill name.")
     p_skill.add_argument("name", help="Skill ID (e.g. coding-boost, memory-slim) or 2-word label.")

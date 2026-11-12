@@ -3,7 +3,7 @@
 """
 WeightX Skills Engine (`src/weightx/skills.py`).
 
-Implements DSH-style ultra-compact 2-word skill pills and `/skill` slash commands.
+Implements DSH-style ultra-compact 2-word skill pills and `/skill <название>` slash commands.
 Behind each tiny 2-word pill (e.g., "Улучшить в кодинге", "Уменьшить память") lies a
 distinct, full multi-stage Weight-Space Programming (WSP) pipeline combining L1 AutoArch,
 L2 Uni-Layer & Knowledge Map, L3 BrainSurgery-WX YAML plans, Closed-Form MEMIT,
@@ -68,7 +68,7 @@ class SkillExecutionResult:
     def to_markdown(self) -> str:
         badge = "ПРИНЯТО (COMMITTED)" if self.accepted else "ОТКАТ (ROLLED BACK)"
         lines = [
-            f"### Навык `/{self.skill_id}` — {self.pill_label}",
+            f"### Скилл `/skill {self.skill_id}` — {self.pill_label}",
             f"**Пайплайн**: {self.pipeline_title}  ",
             f"**Статус Vespasian**: `{badge}`",
             "",
@@ -274,13 +274,28 @@ WSP_SKILLS: list[WeightXSkill] = [
 ]
 
 
+def _strip_skill_prefix(query: str) -> tuple[str, bool]:
+    """Strip `/skill `, `/skills `, `/skill:`, or `skill ` prefix and report whether explicit."""
+    q = query.strip()
+    low = q.lower()
+    for prefix in ("/skill:", "/skills:", "/skill ", "/skills ", "skill ", "skills "):
+        if low.startswith(prefix):
+            return q[len(prefix) :].strip(), True
+    if low in ("/skill", "/skills", "skill", "skills"):
+        return "", True
+    return q, False
+
+
 def resolve_skill(query: str) -> WeightXSkill | None:
-    """Resolve a skill by `/id`, `id`, pill label, or prefix (case-insensitive)."""
-    q = query.strip().lower()
+    """Resolve a skill by `/skill <id>`, `/<id>`, `<id>`, 1..8 index, pill label, or prefix (case-insensitive)."""
+    stripped, _ = _strip_skill_prefix(query)
+    q = stripped.strip().lower()
     if not q:
         return None
-    if q.startswith("/skill "):
-        q = q[7:].strip()
+    if q.isdigit():
+        idx = int(q) - 1
+        if 0 <= idx < len(WSP_SKILLS):
+            return WSP_SKILLS[idx]
     q_clean = q.lstrip("/")
     for sk in WSP_SKILLS:
         if q in sk.aliases or q_clean in sk.aliases or q_clean == sk.skill_id.lower():
@@ -292,6 +307,26 @@ def resolve_skill(query: str) -> WeightXSkill | None:
         if sk.skill_id.startswith(q_clean) or sk.pill_label.lower().startswith(q_clean):
             return sk
     return None
+
+
+def parse_skill_command(raw: str) -> tuple[WeightXSkill | None, str, bool]:
+    """Parse `/skill <name> [args]` or direct skill mention.
+
+    Returns `(matched_skill, remainder_args, explicit_skill_prefix)`.
+    """
+    stripped, explicit = _strip_skill_prefix(raw)
+    if explicit and not stripped:
+        return None, "", True
+    sk = resolve_skill(stripped)
+    if sk is not None:
+        return sk, stripped, explicit
+    # Try first token when args follow (`/skill coding-boost layer=2`)
+    parts = stripped.split(None, 1)
+    if parts:
+        sk_head = resolve_skill(parts[0])
+        if sk_head is not None:
+            return sk_head, (parts[1] if len(parts) > 1 else ""), explicit
+    return None, stripped, explicit
 
 
 def execute_skill(

@@ -65,11 +65,11 @@ class PromptSuggestion:
 CODEX_PROMPT_SUGGESTIONS: list[PromptSuggestion] = [
     PromptSuggestion(
         prompt_id="coding-boost",
-        category="Навык /coding-boost",
+        category="Скилл /skill coding-boost",
         icon="⚡",
         title="Улучшить в кодинге",
         short_hint="Пайплайн 5 шагов: L1/L2 -> фокусировка внимания -> Code MEMIT -> IWCKEdit -> Vespasian",
-        prompt_text="/coding-boost",
+        prompt_text="/skill coding-boost",
         target_tools=[
             "l1_autoarch_inspect",
             "l2_unilayer_profile",
@@ -80,11 +80,11 @@ CODEX_PROMPT_SUGGESTIONS: list[PromptSuggestion] = [
     ),
     PromptSuggestion(
         prompt_id="memory-slim",
-        category="Навык /memory-slim",
+        category="Скилл /skill memory-slim",
         icon="🪶",
         title="Уменьшить память",
         short_hint="Пайплайн 4 шага: спектральный аудит ранга -> svd_low_rank_ -> ties_trim_ -> Vespasian",
-        prompt_text="/memory-slim",
+        prompt_text="/skill memory-slim",
         target_tools=[
             "l2_unilayer_profile",
             "l3_apply_yaml_plan",
@@ -94,11 +94,11 @@ CODEX_PROMPT_SUGGESTIONS: list[PromptSuggestion] = [
     ),
     PromptSuggestion(
         prompt_id="outlier-repair",
-        category="Навык /outlier-repair",
+        category="Скилл /skill outlier-repair",
         icon="🛠",
         title="Починить выбросы",
         short_hint="Пайплайн 4 шага: поиск kurtosis-выбросов -> rescale_outlier_rows_ -> IWCKEdit -> Vespasian",
-        prompt_text="/outlier-repair",
+        prompt_text="/skill outlier-repair",
         target_tools=[
             "l2_unilayer_profile",
             "l3_describe_tensor",
@@ -109,55 +109,56 @@ CODEX_PROMPT_SUGGESTIONS: list[PromptSuggestion] = [
     ),
     PromptSuggestion(
         prompt_id="spectral-denoise",
-        category="Навык /spectral-denoise",
+        category="Скилл /skill spectral-denoise",
         icon="📉",
         title="Снизить перплексию",
         short_hint="Пайплайн 5 шагов: аудит анизотропии -> Closed-Form Domain MEMIT -> контроль KL -> Vespasian",
-        prompt_text="/spectral-denoise",
+        prompt_text="/skill spectral-denoise",
         target_tools=["l3_describe_tensor", "l3_apply_yaml_plan", "l3_verify_and_commit"],
         action_tag="skill:spectral-denoise",
     ),
     PromptSuggestion(
         prompt_id="memit-facts",
-        category="Навык /memit-facts",
+        category="Скилл /skill memit-facts",
         icon="🧠",
         title="Записать факты",
         short_hint="Пайплайн 4 шага: локализация KCI -> оценка ковариации C0^-1 -> MEMIT-MASS -> Vespasian",
-        prompt_text="/memit-facts",
+        prompt_text="/skill memit-facts",
         target_tools=["l3_batch_edit_memit", "l3_verify_and_commit"],
         action_tag="skill:memit-facts",
     ),
     PromptSuggestion(
         prompt_id="knowledge-map",
-        category="Навык /knowledge-map",
+        category="Скилл /skill knowledge-map",
         icon="🗺",
         title="Карта знаний",
         short_hint="Пайплайн 3 шага: нормализованный Logit Lens -> индекс концентрации Джини KCI",
-        prompt_text="/knowledge-map",
+        prompt_text="/skill knowledge-map",
         target_tools=["l2_knowledge_map"],
         action_tag="skill:knowledge-map",
     ),
     PromptSuggestion(
         prompt_id="abliterate",
-        category="Навык /abliterate",
+        category="Скилл /skill abliterate",
         icon="🧭",
         title="Вырезать отказы",
         short_hint="Пайплайн 4 шага: SVD-выделение направления -> project_out_direction_ -> Vespasian",
-        prompt_text="/abliterate",
+        prompt_text="/skill abliterate",
         target_tools=["l3_apply_yaml_plan", "l3_verify_and_commit"],
         action_tag="skill:abliterate",
     ),
     PromptSuggestion(
         prompt_id="vespasian-guard",
-        category="Навык /vespasian-guard",
+        category="Скилл /skill vespasian-guard",
         icon="🛡",
         title="Проверить откат",
         short_hint="Пайплайн 3 шага: снимок весов -> стресс-атака scale_: -50 -> побитовый авто-откат Vespasian",
-        prompt_text="/vespasian-guard",
+        prompt_text="/skill vespasian-guard",
         target_tools=["l3_apply_yaml_plan", "l3_verify_and_commit"],
         action_tag="skill:vespasian-guard",
     ),
 ]
+WSP_SKILL_SUGGESTIONS: list[PromptSuggestion] = CODEX_PROMPT_SUGGESTIONS
 
 
 # ---------------------------------------------------------------------------
