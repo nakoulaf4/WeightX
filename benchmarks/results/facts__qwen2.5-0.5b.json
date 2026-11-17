@@ -1,0 +1,282 @@
+{
+  "model_id": "qwen2.5-0.5b",
+  "hf_repo_id": "Qwen/Qwen2.5-0.5B-Instruct",
+  "target_tensors": [
+    "model.layers.12.mlp.down_proj.weight",
+    "model.layers.14.mlp.down_proj.weight",
+    "model.layers.15.mlp.down_proj.weight",
+    "model.layers.17.mlp.down_proj.weight"
+  ],
+  "load_time_s": 8.16,
+  "spec_extraction_time_s": 47.12,
+  "pool_size_known_facts": 220,
+  "baseline": {
+    "wikitext2": {
+      "ppl": 14.0974,
+      "mean_nll": 2.64599,
+      "tokens_evaluated": 65535
+    },
+    "lambada": {
+      "acc": 0.4,
+      "word_ppl": 24.23,
+      "n_items": 400,
+      "exact_hits": 160
+    },
+    "neighborhood_base_specificity": 1.0
+  },
+  "counterfact_batches": [
+    {
+      "num_facts": 10,
+      "edit_time_s": 30.601,
+      "pre_edit_efficacy": 0.0,
+      "post_edit": {
+        "efficacy_score": 1.0,
+        "top1_new_rate": 0.8,
+        "mean_prob_margin": 0.56017,
+        "mean_logprob_margin": 7.3462,
+        "n_evaluated": 10
+      },
+      "paraphrase": {
+        "efficacy_score": 1.0,
+        "top1_new_rate": 0.6,
+        "mean_prob_margin": 0.41515,
+        "mean_logprob_margin": 5.8343,
+        "n_evaluated": 10
+      },
+      "neighborhood_specificity": 0.8333,
+      "eamit_telemetry": {
+        "num_facts": 10,
+        "target_tensors": [
+          "model.layers.12.mlp.down_proj.weight",
+          "model.layers.14.mlp.down_proj.weight",
+          "model.layers.15.mlp.down_proj.weight",
+          "model.layers.17.mlp.down_proj.weight"
+        ],
+        "pre_edit_mse": 2.12967,
+        "post_edit_mse": 1.098178,
+        "relative_error_reduction_pct": 48.43,
+        "pre_alignment_kl": 0.868456,
+        "post_alignment_kl": 0.15452,
+        "pre_alignment_top_m_mse": 0.054111,
+        "post_alignment_top_m_mse": 0.026981,
+        "per_tensor_l2_deltas": {
+          "model.layers.12.mlp.down_proj.weight": 5.112063,
+          "model.layers.14.mlp.down_proj.weight": 4.510312,
+          "model.layers.15.mlp.down_proj.weight": 4.193475,
+          "model.layers.17.mlp.down_proj.weight": 3.45166
+        },
+        "fisher_protected": true
+      },
+      "retention_eval": null
+    },
+    {
+      "num_facts": 50,
+      "edit_time_s": 29.397,
+      "pre_edit_efficacy": 0.0,
+      "post_edit": {
+        "efficacy_score": 0.98,
+        "top1_new_rate": 0.78,
+        "mean_prob_margin": 0.48107,
+        "mean_logprob_margin": 7.3514,
+        "n_evaluated": 50
+      },
+      "paraphrase": {
+        "efficacy_score": 0.9,
+        "top1_new_rate": 0.44,
+        "mean_prob_margin": 0.25147,
+        "mean_logprob_margin": 4.8212,
+        "n_evaluated": 50
+      },
+      "neighborhood_specificity": 0.8333,
+      "eamit_telemetry": {
+        "num_facts": 50,
+        "target_tensors": [
+          "model.layers.12.mlp.down_proj.weight",
+          "model.layers.14.mlp.down_proj.weight",
+          "model.layers.15.mlp.down_proj.weight",
+          "model.layers.17.mlp.down_proj.weight"
+        ],
+        "pre_edit_mse": 2.052963,
+        "post_edit_mse": 1.109285,
+        "relative_error_reduction_pct": 45.97,
+        "pre_alignment_kl": 1.207312,
+        "post_alignment_kl": 0.396657,
+        "pre_alignment_top_m_mse": 0.183461,
+        "post_alignment_top_m_mse": 0.084542,
+        "per_tensor_l2_deltas": {
+          "model.layers.12.mlp.down_proj.weight": 13.260075,
+          "model.layers.14.mlp.down_proj.weight": 11.33826,
+          "model.layers.15.mlp.down_proj.weight": 10.572371,
+          "model.layers.17.mlp.down_proj.weight": 9.01745
+        },
+        "fisher_protected": true
+      },
+      "retention_eval": {
+        "wikitext2": {
+          "ppl": 16.6815,
+          "mean_nll": 2.8143,
+          "tokens_evaluated": 65535
+        },
+        "lambada": {
+          "acc": 0.3275,
+          "word_ppl": 40.192,
+          "n_items": 400,
+          "exact_hits": 131
+        }
+      }
+    },
+    {
+      "num_facts": 100,
+      "edit_time_s": 29.915,
+      "pre_edit_efficacy": 0.0,
+      "post_edit": {
+        "efficacy_score": 0.98,
+        "top1_new_rate": 0.6,
+        "mean_prob_margin": 0.34725,
+        "mean_logprob_margin": 5.9883,
+        "n_evaluated": 100
+      },
+      "paraphrase": {
+        "efficacy_score": 0.83,
+        "top1_new_rate": 0.36,
+        "mean_prob_margin": 0.18117,
+        "mean_logprob_margin": 3.23,
+        "n_evaluated": 100
+      },
+      "neighborhood_specificity": 0.8833,
+      "eamit_telemetry": {
+        "num_facts": 100,
+        "target_tensors": [
+          "model.layers.12.mlp.down_proj.weight",
+          "model.layers.14.mlp.down_proj.weight",
+          "model.layers.15.mlp.down_proj.weight",
+          "model.layers.17.mlp.down_proj.weight"
+        ],
+        "pre_edit_mse": 1.953316,
+        "post_edit_mse": 1.094498,
+        "relative_error_reduction_pct": 43.97,
+        "pre_alignment_kl": 1.200432,
+        "post_alignment_kl": 0.468314,
+        "pre_alignment_top_m_mse": 0.222239,
+        "post_alignment_top_m_mse": 0.103007,
+        "per_tensor_l2_deltas": {
+          "model.layers.12.mlp.down_proj.weight": 19.806143,
+          "model.layers.14.mlp.down_proj.weight": 17.096358,
+          "model.layers.15.mlp.down_proj.weight": 15.923283,
+          "model.layers.17.mlp.down_proj.weight": 13.692579
+        },
+        "fisher_protected": true
+      },
+      "retention_eval": null
+    }
+  ],
+  "ablation_no_alignment_n50": {
+    "edit_time_s": 29.978,
+    "post_edit": {
+      "efficacy_score": 0.98,
+      "top1_new_rate": 0.76,
+      "mean_prob_margin": 0.4643,
+      "mean_logprob_margin": 7.4365,
+      "n_evaluated": 50
+    },
+    "paraphrase": {
+      "efficacy_score": 0.92,
+      "top1_new_rate": 0.4,
+      "mean_prob_margin": 0.22962,
+      "mean_logprob_margin": 4.8625,
+      "n_evaluated": 50
+    },
+    "neighborhood_specificity": 0.8333,
+    "eamit_telemetry": {
+      "num_facts": 50,
+      "target_tensors": [
+        "model.layers.12.mlp.down_proj.weight",
+        "model.layers.14.mlp.down_proj.weight",
+        "model.layers.15.mlp.down_proj.weight",
+        "model.layers.17.mlp.down_proj.weight"
+      ],
+      "pre_edit_mse": 2.052963,
+      "post_edit_mse": 1.086325,
+      "relative_error_reduction_pct": 47.09,
+      "pre_alignment_kl": 1.207312,
+      "post_alignment_kl": 1.207312,
+      "pre_alignment_top_m_mse": 0.183461,
+      "post_alignment_top_m_mse": 0.183461,
+      "per_tensor_l2_deltas": {
+        "model.layers.12.mlp.down_proj.weight": 14.512337,
+        "model.layers.14.mlp.down_proj.weight": 12.595869,
+        "model.layers.15.mlp.down_proj.weight": 11.723405,
+        "model.layers.17.mlp.down_proj.weight": 10.117366
+      },
+      "fisher_protected": true
+    },
+    "wikitext2": {
+      "ppl": 17.0911,
+      "mean_nll": 2.83856,
+      "tokens_evaluated": 65535
+    },
+    "lambada": {
+      "acc": 0.31,
+      "word_ppl": 44.036,
+      "n_items": 400,
+      "exact_hits": 124
+    }
+  },
+  "associative_scaling": [
+    {
+      "num_facts": 10,
+      "elapsed_ms": 29615.4,
+      "pre_edit_mse": 0.003823,
+      "post_edit_mse": 4e-06,
+      "error_reduction_pct": 99.9,
+      "pre_alignment_kl": 0.04605,
+      "post_alignment_kl": 0.01235,
+      "pre_top_m_mse": 0.00116,
+      "post_top_m_mse": 0.00029
+    },
+    {
+      "num_facts": 50,
+      "elapsed_ms": 29475.2,
+      "pre_edit_mse": 0.003831,
+      "post_edit_mse": 4e-06,
+      "error_reduction_pct": 99.91,
+      "pre_alignment_kl": 0.06325,
+      "post_alignment_kl": 0.04126,
+      "pre_top_m_mse": 0.00164,
+      "post_top_m_mse": 0.00098
+    },
+    {
+      "num_facts": 100,
+      "elapsed_ms": 29610.3,
+      "pre_edit_mse": 0.003887,
+      "post_edit_mse": 3e-06,
+      "error_reduction_pct": 99.93,
+      "pre_alignment_kl": 0.06287,
+      "post_alignment_kl": 0.04988,
+      "pre_top_m_mse": 0.00143,
+      "post_top_m_mse": 0.00097
+    },
+    {
+      "num_facts": 250,
+      "elapsed_ms": 32339.5,
+      "pre_edit_mse": 0.003846,
+      "post_edit_mse": 2e-06,
+      "error_reduction_pct": 99.94,
+      "pre_alignment_kl": 0.06298,
+      "post_alignment_kl": 0.0571,
+      "pre_top_m_mse": 0.00159,
+      "post_top_m_mse": 0.00122
+    },
+    {
+      "num_facts": 500,
+      "elapsed_ms": 36907.6,
+      "pre_edit_mse": 0.003861,
+      "post_edit_mse": 2e-06,
+      "error_reduction_pct": 99.94,
+      "pre_alignment_kl": 0.0612,
+      "post_alignment_kl": 0.05787,
+      "pre_top_m_mse": 0.00158,
+      "post_top_m_mse": 0.0012
+    }
+  ]
+}

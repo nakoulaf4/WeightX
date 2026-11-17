@@ -6,7 +6,7 @@ WeightX Skills Engine (`src/weightx/skills.py`).
 Implements DSH-style ultra-compact 2-word skill pills and `/skill <название>` slash commands.
 Behind each tiny 2-word pill (e.g., "Улучшить в кодинге", "Уменьшить память") lies a
 distinct, full multi-stage Weight-Space Programming (WSP) pipeline combining L1 AutoArch,
-L2 Uni-Layer & Knowledge Map, L3 BrainSurgery-WX YAML plans, Closed-Form MEMIT,
+L2 Uni-Layer & Knowledge Map, L3 BrainSurgery-WX YAML plans, Closed-Form EAMIT,
 IWCKEdit Fisher protection, and Vespasian verification/rollback.
 """
 
@@ -23,7 +23,7 @@ from weightx.declarative.plan_engine import execute_yaml_plan
 from weightx.l1_arch.autoarch import inspect_architecture
 from weightx.l2_profile.knowledge_map import run_knowledge_map
 from weightx.l2_profile.unilayer import profile_model_layers
-from weightx.l3_weights.memit_mass import BatchFactSpec, apply_memit_mass_batch
+from weightx.l3_weights.eamit import BatchFactSpec, apply_eamit_batch
 from weightx.toon_io import dumps_toon as toon_dumps
 
 if TYPE_CHECKING:
@@ -105,7 +105,7 @@ WSP_SKILLS: list[WeightXSkill] = [
     WeightXSkill(
         skill_id="coding-boost",
         pill_label="Улучшить в кодинге",
-        pipeline_title="Multi-Stage Code & Algorithmic Reasoning Boost (L1→L3 + Domain MEMIT)",
+        pipeline_title="Multi-Stage Code & Algorithmic Reasoning Boost (L1→L3 + Domain EAMIT)",
         short_hint="Фокусировка синтаксических голов внимания + калибровка MLP на кодовом корпусе",
         aliases=(
             "coding-boost",
@@ -119,7 +119,7 @@ WSP_SKILLS: list[WeightXSkill] = [
         stage_names=(
             "L1 AutoArch & L2 Uni-Layer: поиск синтаксических и логических слоёв",
             "Sharpening внимания: фокусировка q_proj/k_proj и чистка выбросов",
-            "Closed-Form Code MEMIT: калибровка выходных проекций MLP на алгоритмическом корпусе",
+            "Closed-Form Code EAMIT: калибровка выходных проекций MLP на алгоритмическом корпусе",
             "IWCKEdit Fisher Guard: защита общих языковых весов диагональю Фишера",
             "Vespasian Gate: проверка held-out метрик и фиксация весов",
         ),
@@ -186,20 +186,20 @@ WSP_SKILLS: list[WeightXSkill] = [
         stage_names=(
             "L1+L2 Bottleneck Recon: диагностика спектральной энтропии и анизотропии",
             "Outlier Conditioning: подавление энергетических пиков в down_proj",
-            "Closed-Form Domain MEMIT: аналитическое решение C0^-1 на калибровочном корпусе",
+            "Closed-Form Domain EAMIT: аналитическое решение C0^-1 с выравниванием эмбеддингов",
             "KL & Control Guard: проверка отсутствия дрейфа на контрольном корпусе",
             "Vespasian Commit: фиксация улучшенных весов",
         ),
     ),
     WeightXSkill(
-        skill_id="memit-facts",
+        skill_id="eamit-facts",
         pill_label="Записать факты",
-        pipeline_title="MEMIT-MASS Multi-Layer Covariance-Preserving Fact Injection",
-        short_hint="Пакетная инъекция фактов по нескольким слоям MLP с защитой ковариации C0^-1",
+        pipeline_title="EAMIT Multi-Layer Embedding-Aligned Fact Injection",
+        short_hint="Пакетная инъекция фактов по нескольким слоям MLP с выравниванием эмбеддингов (KL + top-M MSE) и защитой C0^-1",
         aliases=(
-            "memit-facts",
-            "/memit-facts",
-            "memit",
+            "eamit-facts",
+            "/eamit-facts",
+            "eamit",
             "facts",
             "записать факты",
             "факты",
@@ -207,8 +207,8 @@ WSP_SKILLS: list[WeightXSkill] = [
         ),
         stage_names=(
             "Knowledge Map: локализация фактологических слоёв через Gini KCI",
-            "Covariance Estimation: расчёт регуляризованной матрицы C0 + λI",
-            "MEMIT-MASS Batch Update: распределение ΔW по целевым проекциям down_proj",
+            "Embedding Alignment: выравнивание key/residual пространств (KL + top-M MSE)",
+            "EAMIT Batch Update: распределение ΔW по целевым проекциям down_proj",
             "Vespasian Gate: проверка сохранения общего распределения логитов",
         ),
     ),
@@ -319,7 +319,7 @@ def parse_skill_command(raw: str) -> tuple[WeightXSkill | None, str, bool]:
         return None, "", True
     sk = resolve_skill(stripped)
     if sk is not None:
-        return sk, stripped, explicit
+        return sk, "", explicit
     # Try first token when args follow (`/skill coding-boost layer=2`)
     parts = stripped.split(None, 1)
     if parts:
@@ -415,12 +415,12 @@ def execute_skill(
         code_nll_after = 0.0
         if session.tokenizer is not None:
             from weightx.improver import _tokenize_texts
-            from weightx.l3_weights.domain_memit import memit_domain_calibration, token_nll
+            from weightx.l3_weights.domain_eamit import eamit_domain_calibration, token_nll
 
             code_seqs = [s[:96] for s in _tokenize_texts(session.tokenizer, CODE_CALIBRATION_CORPUS) if s.numel() >= 2]
             ctrl_seqs = getattr(session, "_ctrl_seqs", code_seqs) or code_seqs
             code_nll_before, _ = token_nll(session.model, code_seqs)
-            memit_domain_calibration(
+            eamit_domain_calibration(
                 session.model,
                 h.workspace,
                 code_seqs + getattr(session, "_prac_seqs", []),
@@ -655,9 +655,9 @@ def execute_skill(
         )
 
     # ------------------------------------------------------------------
-    # 5. MEMIT FACTS (/memit-facts — "Записать факты")
+    # 5. EAMIT FACTS (/eamit-facts — "Записать факты")
     # ------------------------------------------------------------------
-    if sk.skill_id == "memit-facts":
+    if sk.skill_id == "eamit-facts":
         kmap = run_knowledge_map(session.model, tokenizer=session.tokenizer)
         factual_layers = kmap.dominant_layers_by_domain.get("factual", [])
         record_step(
@@ -670,7 +670,6 @@ def execute_skill(
             candidates = [n for n in h.workspace.names() if len(h.workspace.shape(n)) == 2][-3:]
         base_shape = h.workspace.shape(candidates[0])
         targets = [t for t in candidates if h.workspace.shape(t) == base_shape]
-        record_step(2, sk.stage_names[1], f"оценка C0 + λI для {len(targets)} слоёв ({targets[0]}..)")
 
         rng = np.random.default_rng(7)
         keys = rng.standard_normal((32, base_shape[1])).astype(np.float32)
@@ -678,14 +677,21 @@ def execute_skill(
         vals = (rng.standard_normal((32, base_shape[0])) * 0.015).astype(np.float32)
         facts = [BatchFactSpec(f"fact_{i}", keys[i], vals[i]) for i in range(32)]
 
-        res = apply_memit_mass_batch(h.workspace, targets, facts, lambda_cov=1e-2, apply_fisher_guard=True)
+        res = apply_eamit_batch(h.workspace, targets, facts, lambda_cov=1e-2, apply_fisher_guard=True)
+        record_step(
+            2,
+            sk.stage_names[1],
+            f"выровнены {len(facts)} key/residual пар для {len(targets)} слоёв "
+            f"(KL {res.pre_alignment_kl:.4f}→{res.post_alignment_kl:.4f}, "
+            f"top-M MSE {res.pre_alignment_top_m_mse:.4f}→{res.post_alignment_top_m_mse:.4f})",
+        )
         max_l2_delta = max(res.per_tensor_l2_deltas.values(), default=0.0)
         record_step(
             3,
             sk.stage_names[2],
             f"распределено {len(facts)} фактов по {len(targets)} слоям (max_l2_delta={max_l2_delta:.5f}, mse={res.pre_edit_mse:.4g}->{res.post_edit_mse:.4g})",
         )
-        v = h.vespasian.verify_and_decide(hypothesis="Skill /memit-facts")
+        v = h.vespasian.verify_and_decide(hypothesis="Skill /eamit-facts")
         record_step(4, sk.stage_names[3], v.verdict_reason, status="done" if v.accepted else "rollback")
         return SkillExecutionResult(
             skill_id=sk.skill_id,
@@ -701,6 +707,9 @@ def execute_skill(
                 gini_kci=round(float(kmap.kci_overall), 4),
                 max_l2_delta=round(float(max_l2_delta), 5),
                 error_reduction_pct=round(float(res.relative_error_reduction) * 100.0, 2),
+                alignment_kl_before=round(float(res.pre_alignment_kl), 5),
+                alignment_kl_after=round(float(res.post_alignment_kl), 5),
+                alignment_top_m_mse_after=round(float(res.post_alignment_top_m_mse), 5),
             ),
         )
 

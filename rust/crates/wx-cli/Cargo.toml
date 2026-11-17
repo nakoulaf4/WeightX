@@ -1,0 +1,19 @@
+[package]
+name = "wx-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "WeightX CLI (wx / weightx): case-insensitive WSP skill runner and interactive REPL."
+
+[[bin]]
+name = "wx"
+path = "src/main.rs"
+
+[dependencies]
+weightx-core.workspace = true
+weightx-agent.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+dirs.workspace = true
+ndarray.workspace = true

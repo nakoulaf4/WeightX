@@ -1,10 +1,18 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2026 WeightX Contributors
 """
-Build native Windows executables (`dist/gui/WeightX.exe`, `dist/cli/wx.exe`, `dist/cli/weightx.exe`),
-clean legacy v0.2.0 / WeightX Studio artifacts, build the `.whl` package, install Desktop shortcuts
-(`WeightX.lnk` & `WeightX CLI.lnk`), register case-insensitive `wx` / `weightx` CLI shims,
-and package the v0.3.0 release assets.
+Build the WeightX v0.4.0 HYBRID Windows distribution.
+
+Since v0.4.0 the user-facing product is the Rust hybrid (Rust core + PyTorch
+numeric sidecar, Tauri desktop). This script:
+  1. builds the Rust binaries (wx, wx-bench, weightx-desktop) if cargo is available;
+  2. places them into dist/cli/wx.exe, dist/cli/weightx.exe, dist/gui/WeightX.exe
+     (the targets used by Desktop shortcuts and ~/.local/bin shims);
+  3. reinstalls the editable Python package (sidecar library + entry-point shims)
+     and builds the wheel;
+  4. refreshes Desktop shortcuts and global wx/weightx shims;
+  5. packages the portable zip and release-named assets;
+  6. moves stale v0.3.0 (Python-launcher) artifacts to the Recycle Bin.
 """
 
 from __future__ import annotations
@@ -15,149 +23,104 @@ import sys
 import zipfile
 from pathlib import Path
 
-from weightx.desktop_installer import generate_weightx_icon, install_desktop_shortcut
+ROOT = Path(__file__).resolve().parent.parent
+VERSION = "0.4.0"
+RUST_RELEASE = ROOT / "rust" / "target" / "release"
+
+
+def _recycle(path: Path) -> None:
+    """Send a stale build artifact to the Recycle Bin (never permanent delete)."""
+    ps = (
+        "Add-Type -AssemblyName Microsoft.VisualBasic; "
+        "[Microsoft.VisualBasic.FileIO.FileSystem]::DeleteFile("
+        f"'{path}', 'OnlyErrorDialogs', 'SendToRecycleBin')"
+    )
+    subprocess.run(["powershell", "-NoProfile", "-NonInteractive", "-Command", ps], check=False)
+
+
+def build_rust() -> None:
+    cargo = shutil.which("cargo")
+    if cargo is None:
+        print("cargo not found; using prebuilt binaries in rust/target/release")
+        return
+    for args in (
+        ["build", "--release", "-p", "wx-cli", "--bin", "wx", "--bin", "wx-bench"],
+        ["build", "--release", "-p", "weightx-desktop"],
+    ):
+        subprocess.run([cargo, *args], cwd=ROOT / "rust", check=True)
 
 
 def build_all() -> None:
-    root = Path(__file__).resolve().parent.parent
-    dist = root / "dist"
+    dist = ROOT / "dist"
     gui_dir = dist / "gui"
     cli_dir = dist / "cli"
-    dist.mkdir(exist_ok=True)
-    gui_dir.mkdir(parents=True, exist_ok=True)
-    cli_dir.mkdir(parents=True, exist_ok=True)
+    for d in (dist, gui_dir, cli_dir):
+        d.mkdir(parents=True, exist_ok=True)
 
-    # Refresh logo & icon first
-    ico = generate_weightx_icon(root / "assets" / "weightx.ico")
+    build_rust()
 
-    # Clean up legacy v0.2.0 / WeightX Studio files to prevent stale binaries or case collisions
-    for stale in [
-        root / "WeightX.exe",
-        root / "WeightX-Studio.exe",
-        root / "Launch_WeightX_Studio.cmd",
-        root / "assets" / "weightx_studio.ico",
-        dist / "WeightX.exe",
-        dist / "wx.exe",
-        dist / "weightx.exe",
-        dist / "WeightX-Studio.exe",
-        dist / "WeightX-Studio-v0.2.0-win64.exe",
-        dist / "weightx-cli-v0.2.0-win64.exe",
-        dist / "WeightX-v0.2.0-win64-portable.zip",
-        dist / "weightx-0.2.0-py3-none-any.whl",
-    ]:
-        if stale.exists():
-            try:
-                stale.unlink()
-            except Exception:
-                pass
+    wx_src = RUST_RELEASE / "wx.exe"
+    bench_src = RUST_RELEASE / "wx-bench.exe"
+    gui_src = RUST_RELEASE / "weightx-desktop.exe"
+    for src in (wx_src, gui_src):
+        if not src.is_file():
+            raise SystemExit(f"Missing Rust binary: {src} (run cargo build --release)")
 
-    csc = Path(r"C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe")
-    pyw = root / ".venv" / "Scripts" / "pythonw.exe"
-    py = root / ".venv" / "Scripts" / "python.exe"
+    # Real native binaries replace the old Python-launcher stubs.
+    shutil.copy2(wx_src, cli_dir / "wx.exe")
+    shutil.copy2(wx_src, cli_dir / "weightx.exe")
+    shutil.copy2(gui_src, gui_dir / "WeightX.exe")
+    if bench_src.is_file():
+        shutil.copy2(bench_src, cli_dir / "wx-bench.exe")
 
-    gui_cs = f"""using System;
-using System.Diagnostics;
-using System.IO;
+    # Release-named standalone assets for GitHub Releases.
+    shutil.copy2(gui_dir / "WeightX.exe", dist / f"WeightX-v{VERSION}-win64.exe")
+    shutil.copy2(cli_dir / "wx.exe", dist / f"wx-cli-v{VERSION}-win64.exe")
 
-class WeightXGuiLauncher {{
-    [STAThread]
-    static int Main(string[] args) {{
-        string root = @"{root}";
-        string pyw = @"{pyw}";
-        if (!File.Exists(pyw)) pyw = "pythonw.exe";
-        string argStr = "-m weightx.desktop";
-        if (args.Length > 0) argStr += " " + string.Join(" ", args);
-        var psi = new ProcessStartInfo(pyw, argStr);
-        psi.WorkingDirectory = root;
-        psi.UseShellExecute = false;
-        Process.Start(psi);
-        return 0;
-    }}
-}}
-"""
+    # Editable reinstall (regenerates weightx/wx console shims -> weightx._launcher)
+    # and wheel build.
+    py = ROOT / ".venv" / "Scripts" / "python.exe"
+    py_exe = str(py) if py.is_file() else sys.executable
+    subprocess.run([py_exe, "-m", "pip", "install", "--no-deps", "--no-build-isolation", "-e", str(ROOT)], check=False)
+    subprocess.run([py_exe, "-m", "pip", "wheel", "--no-deps", "--no-build-isolation", "-w", str(dist), str(ROOT)], check=False)
 
-    cli_cs = f"""using System;
-using System.Diagnostics;
-using System.IO;
-using System.Text;
-
-class WeightXCliLauncher {{
-    static int Main(string[] args) {{
-        Console.OutputEncoding = Encoding.UTF8;
-        Console.InputEncoding = Encoding.UTF8;
-        string root = @"{root}";
-        string py = @"{py}";
-        if (!File.Exists(py)) py = "python.exe";
-        var sb = new StringBuilder("-m weightx.cli");
-        foreach (var a in args) {{
-            sb.Append(" \\"").Append(a.Replace("\\"", "\\\\\\"")).Append("\\"");
-        }}
-        var psi = new ProcessStartInfo(py, sb.ToString());
-        psi.WorkingDirectory = root;
-        psi.UseShellExecute = false;
-        var p = Process.Start(psi);
-        p.WaitForExit();
-        return p.ExitCode;
-    }}
-}}
-"""
-
-    gui_src = dist / "gui_launcher.cs"
-    cli_src = dist / "cli_launcher.cs"
-    gui_src.write_text(gui_cs, encoding="utf-8")
-    cli_src.write_text(cli_cs, encoding="utf-8")
-
-    gui_exe = gui_dir / "WeightX.exe"
-    wx_exe = cli_dir / "wx.exe"
-    weightx_cli_exe = cli_dir / "weightx.exe"
-
-    subprocess.run(
-        [str(csc), "/nologo", "/target:winexe", f"/win32icon:{ico}", f"/out:{gui_exe}", str(gui_src)],
-        check=True,
-    )
-    subprocess.run(
-        [str(csc), "/nologo", "/target:exe", f"/win32icon:{ico}", f"/out:{wx_exe}", str(cli_src)],
-        check=True,
-    )
-    subprocess.run(
-        [str(csc), "/nologo", "/target:exe", f"/win32icon:{ico}", f"/out:{weightx_cli_exe}", str(cli_src)],
-        check=True,
-    )
-
-    gui_src.unlink(missing_ok=True)
-    cli_src.unlink(missing_ok=True)
-
-    # Copy distinct release-named standalone binaries for GitHub Releases
-    shutil.copy2(gui_exe, dist / "WeightX-v0.3.0-win64.exe")
-    shutil.copy2(wx_exe, dist / "wx-cli-v0.3.0-win64.exe")
-
-    # Reinstall editable package & build wheel v0.3.0 if pip/wheel available
-    subprocess.run([str(py), "-m", "pip", "install", "--no-deps", "--no-build-isolation", "-e", str(root)], check=False)
-    subprocess.run([str(py), "-m", "pip", "wheel", "--no-deps", "--no-build-isolation", "-w", str(dist), str(root)], check=False)
-
-    # Install Desktop shortcuts (`WeightX.lnk` + `WeightX CLI.lnk`) & global `wx` / `weightx`
+    # Desktop shortcuts + global shims (targets dist/gui and dist/cli, copies to ~/.local/bin).
+    from weightx.desktop_installer import install_desktop_shortcut
     info = install_desktop_shortcut()
     print("Desktop & CLI installed:", info)
 
-    # Package portable zip `dist/WeightX-v0.3.0-win64-portable.zip` (avoiding NTFS case collision inside zip)
-    zip_path = dist / "WeightX-v0.3.0-win64-portable.zip"
+    # Portable zip: native binaries + Python sidecar library + launchers + docs.
+    zip_path = dist / f"WeightX-v{VERSION}-win64-portable.zip"
     with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
-        zf.write(gui_exe, arcname="WeightX/WeightX.exe")
-        zf.write(wx_exe, arcname="WeightX/bin/wx.exe")
-        zf.write(weightx_cli_exe, arcname="WeightX/bin/weightx.exe")
-        for f in ["README.md", "LICENSE", "pyproject.toml", "Launch_WeightX.cmd", "Launch_WeightX_CLI.cmd"]:
-            fp = root / f
+        zf.write(gui_dir / "WeightX.exe", arcname="WeightX/WeightX.exe")
+        zf.write(cli_dir / "wx.exe", arcname="WeightX/bin/wx.exe")
+        zf.write(cli_dir / "weightx.exe", arcname="WeightX/bin/weightx.exe")
+        if bench_src.is_file():
+            zf.write(cli_dir / "wx-bench.exe", arcname="WeightX/bin/wx-bench.exe")
+        for f in ("README.md", "LICENSE", "pyproject.toml", "Launch_WeightX.cmd", "Launch_WeightX_CLI.cmd"):
+            fp = ROOT / f
             if fp.exists():
                 zf.write(fp, arcname=f"WeightX/{f}")
-        for asset in (root / "assets").glob("*"):
+        for asset in (ROOT / "assets").glob("*"):
             if asset.is_file():
                 zf.write(asset, arcname=f"WeightX/assets/{asset.name}")
-        for docf in (root / "docs").glob("*.md"):
+        for docf in (ROOT / "docs").glob("*.md"):
             if docf.is_file():
                 zf.write(docf, arcname=f"WeightX/docs/{docf.name}")
-        for pyf in (root / "src").rglob("*.py"):
-            zf.write(pyf, arcname=f"WeightX/{pyf.relative_to(root).as_posix()}")
+        for pyf in (ROOT / "src").rglob("*.py"):
+            zf.write(pyf, arcname=f"WeightX/{pyf.relative_to(ROOT).as_posix()}")
     print("Packaged portable release:", zip_path)
+
+    # Stale v0.3.0 Python-launcher artifacts -> Recycle Bin.
+    for stale in (
+        dist / f"WeightX-v0.3.0-win64.exe",
+        dist / f"wx-cli-v0.3.0-win64.exe",
+        dist / f"WeightX-v0.3.0-win64-portable.zip",
+        dist / "weightx-0.3.0-py3-none-any.whl",
+    ):
+        if stale.exists():
+            _recycle(stale)
+            print("Recycled stale artifact:", stale.name)
 
 
 if __name__ == "__main__":

@@ -28,7 +28,7 @@ from weightx.harness import WeightXHarness
 from weightx.l1_arch.autoarch import inspect_architecture
 from weightx.l2_profile.knowledge_map import run_knowledge_map
 from weightx.l2_profile.unilayer import profile_model_layers
-from weightx.l3_weights.memit_mass import BatchFactSpec, apply_memit_mass_batch
+from weightx.l3_weights.eamit import BatchFactSpec, apply_eamit_batch
 from weightx.providers import (
     AnthropicProvider,
     AutonomousWSPProvider,
@@ -184,7 +184,7 @@ class StudioSession:
     def _text_splits(self, model: Any, tok: Any) -> tuple[EvaluationSplit, EvaluationSplit, torch.Tensor]:
         from weightx.corpora import GENERAL_CONTROL, WSP_HELD_OUT, WSP_PRACTICE
         from weightx.improver import _tokenize_texts
-        from weightx.l3_weights.domain_memit import token_nll
+        from weightx.l3_weights.domain_eamit import token_nll
 
         prac = _tokenize_texts(tok, WSP_PRACTICE)
         held = _tokenize_texts(tok, WSP_HELD_OUT)
@@ -256,11 +256,11 @@ class StudioSession:
         h = self._require_model()
         if self.tokenizer is None:
             return self._act_chat("Localize and repair outlier neurons, then verify with Vespasian.")
-        from weightx.l3_weights.domain_memit import memit_domain_calibration
+        from weightx.l3_weights.domain_eamit import eamit_domain_calibration
 
         lines = []
         for it in range(3):
-            res = memit_domain_calibration(
+            res = eamit_domain_calibration(
                 self.model, h.workspace, self._prac_seqs, self._ctrl_seqs, iterations=1,
                 max_control_nll_increase=0.01, apply_fisher_guard=False,
             )
@@ -284,7 +284,7 @@ class StudioSession:
         names = [n for n in h.workspace.names() if len(h.workspace.shape(n)) == 2]
         return [n for n in names if any(k in n for k in ("down_proj", "mlp.c_proj", "fc2", "dense_4h_to_h"))]
 
-    def _act_memit_demo(self, _p: str) -> str:
+    def _act_eamit_demo(self, _p: str) -> str:
         h = self._require_model()
         targets = self._mlp_out_tensors()[-3:]
         shape = h.workspace.shape(targets[0])
@@ -293,9 +293,9 @@ class StudioSession:
         keys /= np.linalg.norm(keys, axis=1, keepdims=True)
         vals = rng.standard_normal((32, shape[0])) * 0.05
         facts = [BatchFactSpec(f"fact_{i}", keys[i], vals[i]) for i in range(32)]
-        res = apply_memit_mass_batch(h.workspace, targets, facts, lambda_cov=1e-2, apply_fisher_guard=True)
-        v = h.vespasian.verify_and_decide(hypothesis="MEMIT-MASS synthetic batch")
-        return "## MEMIT-MASS\n" + res.to_toon() + "\n\n## Vespasian\n" + v.verdict_reason
+        res = apply_eamit_batch(h.workspace, targets, facts, lambda_cov=1e-2, apply_fisher_guard=True)
+        v = h.vespasian.verify_and_decide(hypothesis="EAMIT synthetic batch")
+        return "## EAMIT\n" + res.to_toon() + "\n\n## Vespasian\n" + v.verdict_reason
 
     def _act_abliterate(self, _p: str) -> str:
         h = self._require_model()

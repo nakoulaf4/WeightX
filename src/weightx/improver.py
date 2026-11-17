@@ -7,7 +7,7 @@ Implements a multi-stage, gradient-free Weight-Space Programming pipeline to
 diagnose, repair, calibrate, and measurably improve a small causal Language Model:
   1. Baseline Held-Out Evaluation (Perplexity, NLL, Top-1 & Top-5 Token Accuracy, Vespasian Score).
   2. Stage A вЂ” L1 AutoArch + L2 13-Metric Uni-Layer Diagnosis & Outlier/Spectral Repair via YAML Plan.
-  3. Stage B вЂ” Closed-Form Subspace Calibration & Associative Fact Injection (MEMIT-MASS / Ridge)
+  3. Stage B вЂ” Closed-Form Subspace Calibration & Associative Fact Injection (EAMIT / Ridge)
      using hidden-state covariance regularization and IWCKEdit Fisher protection.
   4. Stage C вЂ” Vespasian Held-Out Verification (keeps only stages that strictly improve held-out metrics).
 """
@@ -557,7 +557,7 @@ def _top1_accuracy(model: nn.Module, seqs: list[torch.Tensor]) -> float:
 
 
 def _text_metrics(model: nn.Module, held: list[torch.Tensor], ctrl: list[torch.Tensor]) -> TextQualityMetrics:
-    from weightx.l3_weights.domain_memit import token_nll
+    from weightx.l3_weights.domain_eamit import token_nll
 
     h_nll, _ = token_nll(model, held)
     c_nll, _ = token_nll(model, ctrl)
@@ -583,12 +583,12 @@ def improve_pretrained_lm(
 ) -> PretrainedImprovementReport:
     """Measurably improve a real pretrained causal LM on a target domain without SGD.
 
-    Pipeline: load -> baseline metrics -> closed-form MEMIT domain calibration on practice
-    texts (control-covariance preserving, Fisher-guarded) -> Vespasian verification on hidden
+    Pipeline: load -> baseline metrics -> closed-form EAMIT domain calibration on practice
+    texts (embedding-aligned, control-covariance preserving, Fisher-guarded) -> Vespasian verification on hidden
     held-out texts with control-text KL guard -> keep best checkpoint / rollback.
     """
     from weightx.corpora import GENERAL_CONTROL, WSP_HELD_OUT, WSP_PRACTICE
-    from weightx.l3_weights.domain_memit import memit_domain_calibration, token_nll
+    from weightx.l3_weights.domain_eamit import eamit_domain_calibration, token_nll
 
     torch.manual_seed(0)
     catalog = ModelCatalog()
@@ -628,7 +628,7 @@ def improve_pretrained_lm(
     calib_log: list[dict[str, Any]] = []
     edited: list[str] = []
     for it in range(iterations):
-        res = memit_domain_calibration(
+        res = eamit_domain_calibration(
             model,
             workspace,
             prac,
@@ -648,7 +648,7 @@ def improve_pretrained_lm(
             f"[iter {it + 1}] step={st.chosen_rel_step} practice NLL {st.practice_nll_before:.4f}"
             f"->{st.practice_nll_after:.4f}, control NLL {st.control_nll_before:.4f}->{st.control_nll_after:.4f}"
         )
-        v = vespasian.verify_and_decide(hypothesis=f"MEMIT domain calibration iteration {it + 1}")
+        v = vespasian.verify_and_decide(hypothesis=f"EAMIT domain calibration iteration {it + 1}")
         verdicts.append(v.verdict_reason)
         log(f"[vespasian] {v.verdict_reason}")
         if not v.accepted:

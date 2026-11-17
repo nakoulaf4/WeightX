@@ -1,22 +1,26 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2026 WeightX Contributors
 """
-Closed-Form MEMIT-Style Domain Calibration for Real Pretrained Causal LMs.
+Closed-Form EAMIT Domain Calibration for Real Pretrained Causal LMs.
 
-Extends WeightX MEMIT-MASS from synthetic key/value facts to *real text*:
+Extends WeightX EAMIT (Embedding Alignment Model Editing in Transformers,
+arXiv:2505.11876) from synthetic key/value facts to *real text*:
 
 1. Keys `K_l` are collected at the input of selected MLP output projections
    (`mlp.down_proj` for Llama/Qwen/SmolLM, `mlp.c_proj` for GPT-2, `dense_4h_to_h`, `fc2`).
-2. Residual targets are obtained from the activation-space gradient of the
-   next-token loss on the *visible* practice texts: `R_l = -dL/dO_l`
+2. Raw residual targets are obtained from the activation-space gradient of the
+   next-token loss on the *visible* practice texts: `R_raw_l = -dL/dO_l`
    (no gradient is ever taken w.r.t. weights; no SGD training loop).
-3. A covariance-preserving closed-form update is solved per layer:
+3. EAMIT embedding alignment optimizes `R_l` against `K_l` using KL divergence
+   over pairwise similarity distributions plus top-M cosine-similarity MSE,
+   eliminating representation collisions across tokens with similar keys.
+4. A covariance-preserving closed-form update is solved per layer:
 
        dW_l = R_l^T K_l (K_l^T K_l + lambda * N * C0_l + eps*I)^-1
 
    where `C0_l` is the key covariance on *control* (general-domain) texts,
-   which pushes the update orthogonal to the subspace used by general knowledge.
-4. The update magnitude is chosen by a line search on the practice split under
+   pushing the update orthogonal to the subspace used by general knowledge.
+5. The update magnitude is chosen by a line search on the practice split under
    a control-perplexity budget. The caller then verifies on hidden held-out
    texts through the Vespasian engine and rolls back if it does not help.
 """
@@ -31,6 +35,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from weightx.l3_weights.eamit import EamitAlignConfig, align_residuals_to_keys
 from weightx.l3_weights.workspace import WeightWorkspace
 
 _MLP_OUT_SUFFIXES = ("mlp.down_proj", "mlp.c_proj", "mlp.dense_4h_to_h", "mlp.fc2", "feed_forward.w2")
@@ -45,6 +50,10 @@ class DomainCalibrationStep:
     practice_nll_after: float
     control_nll_before: float
     control_nll_after: float
+    alignment_kl_before: float = 0.0
+    alignment_kl_after: float = 0.0
+    alignment_top_m_mse_before: float = 0.0
+    alignment_top_m_mse_after: float = 0.0
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -55,6 +64,10 @@ class DomainCalibrationStep:
             "practice_nll_after": round(self.practice_nll_after, 5),
             "control_nll_before": round(self.control_nll_before, 5),
             "control_nll_after": round(self.control_nll_after, 5),
+            "alignment_kl_before": round(self.alignment_kl_before, 6),
+            "alignment_kl_after": round(self.alignment_kl_after, 6),
+            "alignment_top_m_mse_before": round(self.alignment_top_m_mse_before, 6),
+            "alignment_top_m_mse_after": round(self.alignment_top_m_mse_after, 6),
         }
 
 
@@ -178,7 +191,7 @@ def _collect_keys_and_grads(
     return k_cat, g_cat
 
 
-def memit_domain_calibration(
+def eamit_domain_calibration(
     model: nn.Module,
     workspace: WeightWorkspace,
     practice_seqs: list[torch.Tensor],
@@ -191,8 +204,9 @@ def memit_domain_calibration(
     max_control_nll_increase: float = 0.01,
     iterations: int = 1,
     apply_fisher_guard: bool = True,
+    align_config: EamitAlignConfig | None = None,
 ) -> DomainCalibrationResult:
-    """Run one or more closed-form domain calibration iterations (see module docstring)."""
+    """Run one or more closed-form EAMIT domain calibration iterations."""
     mod_names = layer_names or select_edit_layers(model, n_layers=n_layers)
     modules = dict(model.named_modules())
     tensor_names = [f"{n}.weight" for n in mod_names]
@@ -200,6 +214,7 @@ def memit_domain_calibration(
     if not mod_names:
         return result
 
+    cfg = align_config or EamitAlignConfig(lambda_kl=0.05, lambda_mse=0.25, top_m=8, align_steps=16, align_lr=0.03)
     ctrl_keys, _ = _collect_keys_and_grads(model, mod_names, control_seqs, need_grads=False)
 
     for it in range(iterations):
@@ -209,16 +224,26 @@ def memit_domain_calibration(
 
         directions: dict[str, np.ndarray] = {}
         base_weights: dict[str, np.ndarray] = {}
+        kl_before_list: list[float] = []
+        kl_after_list: list[float] = []
+        tmse_before_list: list[float] = []
+        tmse_after_list: list[float] = []
+
         for mn, tn in zip(mod_names, tensor_names):
             K = k_prac[mn]                      # [N, d_in]
-            R = -g_prac[mn]                     # [N, d_out]
+            R_raw = -g_prac[mn]                 # [N, d_out]
             Kc = ctrl_keys[mn]                  # [Nc, d_in]
             n_p = K.shape[0]
             d_in = K.shape[1]
+
+            # EAMIT embedding alignment: align token residuals R_raw^T to token keys K^T
+            R_aligned_t, a_stats = align_residuals_to_keys(K.T, R_raw.T, cfg)
+            R = R_aligned_t.T                   # [N, d_out]
+
             C0 = (Kc.T @ Kc) / max(Kc.shape[0], 1)
             A = K.T @ K + lambda_preserve * n_p * C0
             A += (1e-3 * np.trace(A) / d_in + 1e-8) * np.eye(d_in)
-            D_lin = np.linalg.solve(A, (R.T @ K).T).T   # [d_out, d_in] == R^T K A^-1 (A symmetric)
+            D_lin = np.linalg.solve(A, (R.T @ K).T).T   # [d_out, d_in] == R^T K A^-1
             W0 = workspace.get_readonly(tn).astype(np.float64)
             D = D_lin.T if _is_conv1d(modules[mn]) else D_lin
             if D.shape != W0.shape:
@@ -228,6 +253,10 @@ def memit_domain_calibration(
                 continue
             directions[tn] = D * (float(np.linalg.norm(W0)) / dn)
             base_weights[tn] = W0
+            kl_before_list.append(a_stats.pre_kl)
+            kl_after_list.append(a_stats.post_kl)
+            tmse_before_list.append(a_stats.pre_top_m_mse)
+            tmse_after_list.append(a_stats.post_top_m_mse)
 
         if not directions:
             break
@@ -259,6 +288,10 @@ def memit_domain_calibration(
                 practice_nll_after=best[1],
                 control_nll_before=ctrl_nll0,
                 control_nll_after=best[2],
+                alignment_kl_before=float(np.mean(kl_before_list)) if kl_before_list else 0.0,
+                alignment_kl_after=float(np.mean(kl_after_list)) if kl_after_list else 0.0,
+                alignment_top_m_mse_before=float(np.mean(tmse_before_list)) if tmse_before_list else 0.0,
+                alignment_top_m_mse_after=float(np.mean(tmse_after_list)) if tmse_after_list else 0.0,
             )
         )
         if best[0] == 0.0:

@@ -8,7 +8,7 @@ Causal Transformer Language Model (RMSNorm + SwiGLU Gated MLP + Q/K/V/O Attentio
   1. Recon (L1 AutoArch + L2 13-Metric Uni-Layer Profile + L2 Logit Lens & Gini KCI)
   2. Localization (Pinpointing corrupted outlier neurons in Layer 2 without overflowing context)
   3. Declarative YAML Planning (BrainSurgery-WX plan with mandatory shape/dtype/finite assertions)
-  4. Execution with IWCKEdit Fisher Protection + MEMIT-MASS Batch Editing (50 simultaneous facts)
+  4. Execution with IWCKEdit Fisher Protection + EAMIT Batch Editing (50 simultaneous facts)
   5. Vespasian Held-Out Verification & Automatic Rollback on Regression + TOON Token Savings Report.
 """
 
@@ -27,7 +27,7 @@ from weightx import (
     BatchFactSpec,
     EvaluationSplit,
     WeightXHarness,
-    apply_memit_mass_batch,
+    apply_eamit_batch,
     compare_toon_vs_json,
     execute_yaml_plan,
 )
@@ -247,8 +247,8 @@ transforms:
     print(f"    • Restored Best Score     : {rollback_verdict.best_score_after:.4f}")
     print(f"    • Verdict                 : {rollback_verdict.verdict_reason}")
 
-    # Demonstrate MEMIT-MASS Simultaneous Batch Associative Editing (50 facts across layers 1, 2, 3)
-    print("\n[4] Demonstrating MEMIT-MASS Batch Editing (50 Facts Across 3 MLP Layers):")
+    # Demonstrate EAMIT Simultaneous Batch Associative Editing (50 facts across layers 1, 2, 3)
+    print("\n[4] Demonstrating EAMIT Batch Editing (50 Facts Across 3 MLP Layers):")
     rng = np.random.default_rng(7)
     d_in = model.config.intermediate_size
     d_out = model.config.hidden_size
@@ -261,23 +261,27 @@ transforms:
         BatchFactSpec(fact_id=f"fact_{i}", key_vector=raw_keys[i], target_value_vector=target_vals[i])
         for i in range(50)
     ]
-    memit_targets = [
+    eamit_targets = [
         "model.layers.1.mlp.down_proj.weight",
         "model.layers.2.mlp.down_proj.weight",
         "model.layers.3.mlp.down_proj.weight",
     ]
-    memit_res = apply_memit_mass_batch(
+    eamit_res = apply_eamit_batch(
         harness.workspace,
-        memit_targets,
+        eamit_targets,
         facts,
         lambda_cov=1e-2,
         apply_fisher_guard=True,
     )
-    print(f"    • Batch Size              : {memit_res.num_facts} facts across {len(memit_res.target_tensors)} layers")
-    print(f"    • Pre-Edit Memory MSE     : {memit_res.pre_edit_mse:.6f}")
-    print(f"    • Post-Edit Memory MSE    : {memit_res.post_edit_mse:.6f} ({memit_res.relative_error_reduction * 100:.1f}% error reduction)")
+    print(f"    • Batch Size              : {eamit_res.num_facts} facts across {len(eamit_res.target_tensors)} layers")
+    print(f"    • Pre-Edit Memory MSE     : {eamit_res.pre_edit_mse:.6f}")
+    print(f"    • Post-Edit Memory MSE    : {eamit_res.post_edit_mse:.6f} ({eamit_res.relative_error_reduction * 100:.1f}% error reduction)")
+    print(
+        f"    • Alignment KL / Top-M    : {eamit_res.pre_alignment_kl:.4f} -> {eamit_res.post_alignment_kl:.4f} "
+        f"/ {eamit_res.pre_alignment_top_m_mse:.4f} -> {eamit_res.post_alignment_top_m_mse:.4f}"
+    )
 
-    # Restore best checkpoint after standalone MEMIT demo
+    # Restore best checkpoint after standalone EAMIT demo
     harness.workspace.restore("vespasian_best")
 
     # Measure TOON vs JSON token savings on the L3 tensor table
@@ -294,7 +298,7 @@ transforms:
     return {
         "run_result": run_res.to_dict(),
         "rollback_verdict": rollback_verdict.to_dict(),
-        "memit_result": memit_res.to_dict(),
+        "eamit_result": eamit_res.to_dict(),
         "toon_savings": savings.to_dict(),
     }
 

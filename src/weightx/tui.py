@@ -497,7 +497,7 @@ def run_interactive_cli(initial_model: str = "minillama-demo") -> int:
 
         if sk_match is not None:
             t0 = time.perf_counter()
-            res = session.run_skill(sk_match.skill_id, user_args=rem_args or raw)
+            res = session.run_skill(sk_match.skill_id, user_args=rem_args)
             _print_execution_block(
                 console,
                 f"/skill {sk_match.skill_id}",

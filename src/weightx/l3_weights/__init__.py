@@ -1,12 +1,15 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2026 WeightX Contributors
-"""L3 Weight Reading, Slicing, Checkpointing, and Batch Associative Editing (MEMIT-MASS)."""
+"""L3 Weight Reading, Slicing, Checkpointing, and Batch Associative Editing (EAMIT)."""
 
-from .memit_mass import (
+from .eamit import (
     BatchFactSpec,
-    MemitMassResult,
+    EamitAlignConfig,
+    EamitAlignStats,
+    EamitResult,
+    align_residuals_to_keys,
     apply_closed_form_ridge,
-    apply_memit_mass_batch,
+    apply_eamit_batch,
 )
 from .workspace import (
     TensorDiffRecord,
@@ -16,10 +19,13 @@ from .workspace import (
 
 __all__ = [
     "BatchFactSpec",
-    "MemitMassResult",
+    "EamitAlignConfig",
+    "EamitAlignStats",
+    "EamitResult",
     "TensorDiffRecord",
     "WeightWorkspace",
     "WorkspaceDiffSummary",
+    "align_residuals_to_keys",
     "apply_closed_form_ridge",
-    "apply_memit_mass_batch",
+    "apply_eamit_batch",
 ]

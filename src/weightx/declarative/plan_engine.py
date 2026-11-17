@@ -10,7 +10,7 @@ references and `assert` expressions `exists`, `count`, `shape`, `dimensions`, `d
   - Mandatory invariant policy (`require_assertions=True` by default for LLM plans),
   - Zero-filesystem lockdown (blocks `load`, `save`, and external file paths in LLM plans),
   - First-class WSP & batch transforms (`rescale_outlier_rows_`, `phlora_`,
-    `prune_magnitude_`, `rank_one_update_`, `closed_form_ridge_`, `memit_mass_`),
+    `prune_magnitude_`, `rank_one_update_`, `closed_form_ridge_`, `eamit_batch_`),
   - Automatic IWCKEdit Fisher protection and atomic rollback on any assertion failure.
 """
 
@@ -22,10 +22,11 @@ from typing import Any
 import numpy as np
 import yaml
 
-from weightx.l3_weights.memit_mass import (
+from weightx.l3_weights.eamit import (
     BatchFactSpec,
+    EamitAlignConfig,
     apply_closed_form_ridge,
-    apply_memit_mass_batch,
+    apply_eamit_batch,
 )
 from weightx.l3_weights.workspace import WeightWorkspace, parse_safe_slice
 from weightx.toon_io import dumps_toon
@@ -68,7 +69,7 @@ MUTATION_OPS = frozenset(
         "replace_nonfinite_",
         "rank_one_update_",
         "closed_form_ridge_",
-        "memit_mass_",
+        "eamit_batch_",
     }
 )
 
@@ -792,7 +793,7 @@ def _apply_mutation_step(
         )
         return 1, f"closed_form_ridge_({target}, post_mse={info['post_mse']})"
 
-    if op_name == "memit_mass_":
+    if op_name == "eamit_batch_":
         raw_targets = payload.get("targets") or payload.get("target")
         if isinstance(raw_targets, str):
             targets, _ = _resolve_targets(workspace, raw_targets)
@@ -808,16 +809,24 @@ def _apply_mutation_step(
             for i, f in enumerate(raw_facts)
         ]
         lam = float(payload.get("lambda_cov", 1e-2))
-        res = apply_memit_mass_batch(
+        align_cfg = EamitAlignConfig(
+            lambda_kl=float(payload.get("lambda_kl", 0.05)),
+            lambda_mse=float(payload.get("lambda_mse", 0.25)),
+            top_m=int(payload.get("top_m", 8)),
+            align_steps=int(payload.get("align_steps", 20)),
+        )
+        res = apply_eamit_batch(
             workspace,
             targets,
             facts,
             lambda_cov=lam,
             apply_fisher_guard=apply_fisher_guard,
+            align_config=align_cfg,
         )
         return len(targets), (
-            f"memit_mass_({res.num_facts} facts across {len(targets)} layers, "
-            f"mse {res.pre_edit_mse:.4g}->{res.post_edit_mse:.4g})"
+            f"eamit_batch_({res.num_facts} facts across {len(targets)} layers, "
+            f"mse {res.pre_edit_mse:.4g}->{res.post_edit_mse:.4g}, "
+            f"kl {res.pre_alignment_kl:.4g}->{res.post_alignment_kl:.4g})"
         )
 
     raise PlanValidationError(f"Unsupported mutation op: {op_name!r}")

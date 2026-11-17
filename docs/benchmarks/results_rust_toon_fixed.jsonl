@@ -1,0 +1,1 @@
+﻿{"chars":21400,"cmd":"toon","note":"post-fix: numeric-string quoting + shortest-roundtrip floats","decode":{"iters":20,"max_ms":0.8052,"mean_ms":0.67378,"min_ms":0.3662},"encode":{"iters":20,"max_ms":0.9208,"mean_ms":0.737795,"min_ms":0.4523}}

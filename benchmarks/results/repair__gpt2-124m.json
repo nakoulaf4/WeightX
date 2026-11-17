@@ -1,0 +1,312 @@
+{
+  "model_id": "gpt2-124m",
+  "hf_repo_id": "openai-community/gpt2",
+  "total_params": 124439808,
+  "load_time_s": 6.98,
+  "baseline_eval_time_s": 12.17,
+  "suite5_knowledge_map": {
+    "family": "decoder_transformer",
+    "num_layers": 12,
+    "d_model": 768,
+    "n_heads": 12,
+    "kci_overall": 0.5409,
+    "kci_per_domain": {
+      "factual": 0.5561,
+      "reasoning": 0.5261,
+      "syntactic": 0.5406
+    },
+    "concentration_regime": "concentrated_fragile",
+    "avg_crystallization_layer": 8.17,
+    "crystallization_fraction": 0.681,
+    "dominant_layers_by_domain": {
+      "factual": [
+        11,
+        10,
+        9
+      ],
+      "reasoning": [
+        11,
+        10,
+        9
+      ],
+      "syntactic": [
+        11,
+        10,
+        0
+      ]
+    },
+    "bottleneck_layers": [],
+    "redundant_layers": [
+      "layer_4",
+      "layer_5"
+    ],
+    "natural_outlier_tensors": 9,
+    "max_natural_row_ratio": 7.427,
+    "mean_effective_rank": 653.85,
+    "mean_stable_rank": 45.71,
+    "max_weight_kurtosis": 215.06,
+    "profile_time_s": 13.61
+  },
+  "suite5_vespasian_guard": {
+    "target_tensor": "transformer.h.6.mlp.c_proj.weight",
+    "sha256_before": "8b4552dc39a05023",
+    "scale_attack_rolled_back": true,
+    "scale_attack_max_abs_diff": 0.0,
+    "scale_attack_sha256_match": true,
+    "nan_attack_rolled_back": true,
+    "nan_attack_nonfinite_detected": 1,
+    "nan_attack_sha256_match": true,
+    "noise_attack_rolled_back": true,
+    "noise_attack_kl_drift": 0.6545,
+    "noise_attack_sha256_match": true
+  },
+  "suite3_outlier_repair": {
+    "injected_tensor": "transformer.h.6.mlp.c_proj.weight",
+    "injected_rows": [
+      81,
+      549,
+      2615
+    ],
+    "scale_factors": [
+      16.0,
+      14.0,
+      12.0
+    ],
+    "localization_found_tensor": true,
+    "localization_row_recall": 1.0,
+    "clean": {
+      "wikitext2": {
+        "ppl": 25.5798,
+        "mean_nll": 3.2418,
+        "tokens_evaluated": 65535
+      },
+      "lambada": {
+        "acc": 0.2525,
+        "word_ppl": 90.006,
+        "n_items": 400,
+        "exact_hits": 101
+      },
+      "arc_easy": {
+        "acc": 0.4225,
+        "acc_norm": 0.415,
+        "n_items": 400
+      }
+    },
+    "corrupted": {
+      "wikitext2": {
+        "ppl": 26.7065,
+        "mean_nll": 3.28491,
+        "tokens_evaluated": 65535
+      },
+      "lambada": {
+        "acc": 0.26,
+        "word_ppl": 86.023,
+        "n_items": 400,
+        "exact_hits": 104
+      },
+      "arc_easy": {
+        "acc": 0.425,
+        "acc_norm": 0.4225,
+        "n_items": 400
+      }
+    },
+    "repaired_with_fisher": {
+      "wikitext2": {
+        "ppl": 25.5808,
+        "mean_nll": 3.24184,
+        "tokens_evaluated": 65535
+      },
+      "lambada": {
+        "acc": 0.2525,
+        "word_ppl": 90.138,
+        "n_items": 400,
+        "exact_hits": 101
+      },
+      "arc_easy": {
+        "acc": 0.4225,
+        "acc_norm": 0.415,
+        "n_items": 400
+      }
+    },
+    "repaired_no_fisher": {
+      "wikitext2": {
+        "ppl": 25.5808,
+        "mean_nll": 3.24184,
+        "tokens_evaluated": 65535
+      },
+      "lambada": {
+        "acc": 0.2525,
+        "word_ppl": 90.138,
+        "n_items": 400,
+        "exact_hits": 101
+      },
+      "arc_easy": {
+        "acc": 0.4225,
+        "acc_norm": 0.415,
+        "n_items": 400
+      }
+    },
+    "vespasian_accepted": true,
+    "changed_params": 2304,
+    "changed_pct": 0.00185,
+    "wt2_ppl_recovery_pct_fisher": 99.91,
+    "wt2_ppl_recovery_pct_no_fisher": 99.91,
+    "lambada_acc_recovery_pct_fisher": 100.0,
+    "repair_time_s": 13.053,
+    "plan_mutations": 1
+  },
+  "suite4_memory_slim": {
+    "clean_baseline": {
+      "wikitext2": {
+        "ppl": 25.5798,
+        "mean_nll": 3.2418,
+        "tokens_evaluated": 65535
+      },
+      "lambada": {
+        "acc": 0.2525,
+        "word_ppl": 90.006,
+        "n_items": 400,
+        "exact_hits": 101
+      },
+      "arc_easy": {
+        "acc": 0.4225,
+        "acc_norm": 0.415,
+        "n_items": 400
+      }
+    },
+    "sweeps": [
+      {
+        "rank_ratio": 0.7,
+        "target_tensors": [
+          "transformer.h.4.mlp.c_proj.weight",
+          "transformer.h.6.mlp.c_proj.weight",
+          "transformer.h.7.mlp.c_proj.weight",
+          "transformer.h.9.mlp.c_proj.weight"
+        ],
+        "target_factorized_param_saving_pct": 12.43,
+        "total_model_param_saving_pct": 0.94,
+        "metrics": {
+          "wikitext2": {
+            "ppl": 26.578,
+            "mean_nll": 3.28008,
+            "tokens_evaluated": 65535
+          },
+          "lambada": {
+            "acc": 0.245,
+            "word_ppl": 106.889,
+            "n_items": 400,
+            "exact_hits": 98
+          },
+          "arc_easy": {
+            "acc": 0.4375,
+            "acc_norm": 0.415,
+            "n_items": 400
+          }
+        },
+        "wikitext2_ppl_delta_pct": 3.9,
+        "lambada_acc_delta": -0.0075,
+        "arc_easy_acc_norm_delta": 0.0,
+        "elapsed_s": 53.67
+      },
+      {
+        "rank_ratio": 0.6,
+        "target_tensors": [
+          "transformer.h.4.mlp.c_proj.weight",
+          "transformer.h.6.mlp.c_proj.weight",
+          "transformer.h.7.mlp.c_proj.weight",
+          "transformer.h.9.mlp.c_proj.weight"
+        ],
+        "target_factorized_param_saving_pct": 24.97,
+        "total_model_param_saving_pct": 1.89,
+        "metrics": {
+          "wikitext2": {
+            "ppl": 26.9663,
+            "mean_nll": 3.29459,
+            "tokens_evaluated": 65535
+          },
+          "lambada": {
+            "acc": 0.2625,
+            "word_ppl": 104.699,
+            "n_items": 400,
+            "exact_hits": 105
+          },
+          "arc_easy": {
+            "acc": 0.45,
+            "acc_norm": 0.4175,
+            "n_items": 400
+          }
+        },
+        "wikitext2_ppl_delta_pct": 5.42,
+        "lambada_acc_delta": 0.01,
+        "arc_easy_acc_norm_delta": 0.0025,
+        "elapsed_s": 54.96
+      },
+      {
+        "rank_ratio": 0.5,
+        "target_tensors": [
+          "transformer.h.4.mlp.c_proj.weight",
+          "transformer.h.6.mlp.c_proj.weight",
+          "transformer.h.7.mlp.c_proj.weight",
+          "transformer.h.9.mlp.c_proj.weight"
+        ],
+        "target_factorized_param_saving_pct": 37.5,
+        "total_model_param_saving_pct": 2.84,
+        "metrics": {
+          "wikitext2": {
+            "ppl": 27.5767,
+            "mean_nll": 3.31697,
+            "tokens_evaluated": 65535
+          },
+          "lambada": {
+            "acc": 0.25,
+            "word_ppl": 112.938,
+            "n_items": 400,
+            "exact_hits": 100
+          },
+          "arc_easy": {
+            "acc": 0.43,
+            "acc_norm": 0.4225,
+            "n_items": 400
+          }
+        },
+        "wikitext2_ppl_delta_pct": 7.81,
+        "lambada_acc_delta": -0.0025,
+        "arc_easy_acc_norm_delta": 0.0075,
+        "elapsed_s": 53.64
+      },
+      {
+        "rank_ratio": 0.4,
+        "target_tensors": [
+          "transformer.h.4.mlp.c_proj.weight",
+          "transformer.h.6.mlp.c_proj.weight",
+          "transformer.h.7.mlp.c_proj.weight",
+          "transformer.h.9.mlp.c_proj.weight"
+        ],
+        "target_factorized_param_saving_pct": 50.03,
+        "total_model_param_saving_pct": 3.79,
+        "metrics": {
+          "wikitext2": {
+            "ppl": 28.5192,
+            "mean_nll": 3.35058,
+            "tokens_evaluated": 65535
+          },
+          "lambada": {
+            "acc": 0.2425,
+            "word_ppl": 124.317,
+            "n_items": 400,
+            "exact_hits": 97
+          },
+          "arc_easy": {
+            "acc": 0.45,
+            "acc_norm": 0.415,
+            "n_items": 400
+          }
+        },
+        "wikitext2_ppl_delta_pct": 11.49,
+        "lambada_acc_delta": -0.01,
+        "arc_easy_acc_norm_delta": 0.0,
+        "elapsed_s": 55.32
+      }
+    ]
+  }
+}

@@ -1,0 +1,28 @@
+[package]
+name = "weightx-desktop"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "WeightX Desktop (Tauri 2): minimalist weight-surgery GUI backed by weightx-core."
+
+[lib]
+name = "weightx_desktop_lib"
+path = "src/lib.rs"
+
+[[bin]]
+name = "weightx-desktop"
+path = "src/main.rs"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+weightx-core.workspace = true
+weightx-agent.workspace = true
+tauri = { version = "2", features = [] }
+serde.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+ndarray.workspace = true
+ureq = { version = "2", default-features = false, features = ["tls", "gzip", "json"] }

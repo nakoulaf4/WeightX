@@ -15,3 +15,7 @@ checkpoints/*.safetensors
 models/*.safetensors
 *.pt
 *.bin
+
+# Rust build artifacts & benchmark dataset cache
+rust/target/
+benchmarks/cache/

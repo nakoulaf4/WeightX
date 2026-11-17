@@ -1,0 +1,4 @@
+{"cmd":"startup-rust-wx-help","min_ms":57.540000000000006,"iters":5,"mean_ms":211.82046000000005}
+{"cmd":"startup-python-wx-help","min_ms":2892.1894,"iters":5,"mean_ms":2947.31016}
+{"cmd":"e2e-demo-rust","min_ms":301.1736,"iters":1,"mean_ms":301.1736}
+{"cmd":"e2e-demo-python","min_ms":3392.3772000000004,"iters":1,"mean_ms":3392.3772000000004}

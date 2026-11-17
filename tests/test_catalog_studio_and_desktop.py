@@ -90,7 +90,7 @@ def test_wsp_skills_and_case_insensitive_resolution():
         "memory-slim",
         "outlier-repair",
         "spectral-denoise",
-        "memit-facts",
+        "eamit-facts",
         "knowledge-map",
         "abliterate",
         "vespasian-guard",
@@ -128,7 +128,7 @@ def test_studio_session_run_skill_pipelines():
         "memory-slim",
         "outlier-repair",
         "spectral-denoise",
-        "memit-facts",
+        "eamit-facts",
         "knowledge-map",
         "abliterate",
         "vespasian-guard",
@@ -155,5 +155,64 @@ def test_cli_case_insensitive_subcommands_and_skills():
     assert cli_main(["Catalog"]) == 0
     assert cli_main(["PROMPTS"]) == 0
     assert cli_main(["skill", "VESPASIAN-GUARD"]) == 0
+    assert cli_main(["/skill", "VESPASIAN-GUARD"]) == 0
     assert cli_main(["SKILL", "/coding-boost"]) == 0
+
+
+def test_parse_skill_command_and_catalog_skill_naming():
+    from weightx.catalog import WSP_SKILL_SUGGESTIONS
+    from weightx.skills import parse_skill_command
+
+    assert WSP_SKILL_SUGGESTIONS == CODEX_PROMPT_SUGGESTIONS
+    assert all(p.prompt_text.startswith("/skill ") for p in WSP_SKILL_SUGGESTIONS)
+    assert all(p.category.startswith("Скилл ") for p in WSP_SKILL_SUGGESTIONS)
+
+    sk, rem, exp = parse_skill_command("/skill coding-boost")
+    assert exp is True and sk is not None and sk.skill_id == "coding-boost" and rem == ""
+
+    sk2, _, exp2 = parse_skill_command("/SKILL Улучшить в кодинге")
+    assert exp2 is True and sk2 is not None and sk2.skill_id == "coding-boost"
+
+    sk3, _, exp3 = parse_skill_command("/skill")
+    assert exp3 is True and sk3 is None
+
+
+def test_cli_slash_suggestions_and_completions():
+    from weightx.tui import get_cli_suggestions
+
+    root_sugs = get_cli_suggestions("/")
+    root_texts = {s.text for s in root_sugs}
+    assert any(t.startswith("/skill") for t in root_texts)
+    assert any(t.startswith("/load") for t in root_texts)
+
+    all_skills = get_cli_suggestions("/skill ")
+    assert len(all_skills) == 8
+    assert any("coding-boost" in s.text for s in all_skills)
+
+    mem_sugs = get_cli_suggestions("/skill mem")
+    mem_texts = " ".join(s.text for s in mem_sugs)
+    assert "memory-slim" in mem_texts
+    eam_sugs = get_cli_suggestions("/skill eam")
+    eam_texts = " ".join(s.text for s in eam_sugs)
+    assert "eamit-facts" in eam_texts
+
+    load_sugs = get_cli_suggestions("/load smol", model_ids=["minillama-demo", "smollm2-135m"])
+    assert any("smollm2-135m" in s.text for s in load_sugs)
+
+    brain_sugs = get_cli_suggestions("/brain ")
+    assert len(brain_sugs) >= 1
+
+
+def test_desktop_animations_bg_modes_and_smoke():
+    from weightx.desktop import BG_MODES, ease_in_out_cubic, ease_out_cubic, launch_desktop_app, lerp_hex
+
+    mid = lerp_hex("#000000", "#ffffff", 0.5)
+    assert mid.startswith("#") and len(mid) == 7
+    assert ease_out_cubic(0.0) == 0.0 and ease_out_cubic(1.0) == 1.0
+    assert 0.0 < ease_out_cubic(0.5) < 1.0
+    assert ease_in_out_cubic(0.0) == 0.0 and ease_in_out_cubic(1.0) == 1.0
+    assert 0.0 < ease_in_out_cubic(0.5) < 1.0
+    assert len(BG_MODES) == 4
+    assert launch_desktop_app(smoke_test_ms=700) == 0
+
 

@@ -7,7 +7,7 @@ Coordinates the three isolated architectural layers:
   1. Provider Layer (`LLMProvider` — OpenAI/OpenRouter/vLLM/Ollama/LM Studio, Anthropic,
      CLI agents Claude Code/Codex/OpenCode/Antigravity/DSH, or custom callables)
   2. Tool Layer (`ToolRegistry` — L1 AutoArch, L2 Uni-Layer & Knowledge Map,
-     L3 Workspace/Slices/BrainSurgery-WX YAML/MEMIT-MASS/Sandbox, Vespasian verify)
+     L3 Workspace/Slices/BrainSurgery-WX YAML/EAMIT/Sandbox, Vespasian verify)
   3. Execution & Verification Layer (`WeightWorkspace`, `FisherGuard`, `IsolatedSandbox`,
      `VespasianEngine` with hidden held-out split and automatic rollback).
 """
@@ -37,7 +37,7 @@ Follow the 5-stage WeightX editing cycle strictly:
   1. RECON: Call `l1_autoarch_inspect`, `l2_unilayer_profile`, and `l2_knowledge_map` to obtain a compact TOON profile of the model architecture, 13 layer metrics, and Knowledge Concentration Index (KCI).
   2. LOCALIZATION: Form a precise hypothesis (e.g., anomalous outlier neurons or localized factual projections in specific layers) and inspect only the relevant tensors via `l3_describe_tensor` and `l3_read_tensor_slice`.
   3. PLANNING: Construct a declarative BrainSurgery-WX YAML plan (`transforms: [...]`) that includes `assert` steps (`exists`, `shape`, `dtype`, `finite`, `norm`) before and after mutations.
-  4. EXECUTION: Apply the YAML plan via `l3_apply_yaml_plan` (or `l3_batch_edit_memit` for batch factual edits) and check the visible practice split via `l3_practice_probe`.
+  4. EXECUTION: Apply the YAML plan via `l3_apply_yaml_plan` (or `l3_batch_edit_eamit` for batch factual edits) and check the visible practice split via `l3_practice_probe`.
   5. VERIFICATION & ROLLBACK (Vespasian): Call `l3_verify_and_commit` with your hypothesis so the harness evaluates the edit on the hidden held-out test split and either commits the new best checkpoint or automatically rolls back regressions.
 """
 

@@ -1,0 +1,36 @@
+{
+  "smollm2": {
+    "targets": [
+      "model.layers.13.mlp.down_proj.weight",
+      "model.layers.17.mlp.down_proj.weight",
+      "model.layers.22.mlp.down_proj.weight",
+      "model.layers.26.mlp.down_proj.weight"
+    ],
+    "facts_file": "C:\\Users\\runbo\\Downloads\\WeightX\\docs\\benchmarks\\facts_smollm2.json",
+    "d_in": 1536,
+    "d_out": 576,
+    "safetensors": "C:\\Users\\runbo\\.cache\\huggingface\\hub\\models--HuggingFaceTB--SmolLM2-135M\\snapshots\\93efa2f097d58c2a74874c7e644dbc9b0cee75a2\\model.safetensors"
+  },
+  "tinygpt2": {
+    "targets": [
+      "transformer.h.0.mlp.c_proj.weight",
+      "transformer.h.1.mlp.c_proj.weight"
+    ],
+    "facts_file": "C:\\Users\\runbo\\Downloads\\WeightX\\docs\\benchmarks\\facts_tinygpt2.json",
+    "d_in": 2,
+    "d_out": 8,
+    "safetensors": "C:\\Users\\runbo\\.cache\\huggingface\\hub\\models--sshleifer--tiny-gpt2\\snapshots\\d1856183d08a67c27a8e4ca1492d1d32b96c7c1a\\model.safetensors"
+  },
+  "minillama": {
+    "targets": [
+      "model.layers.1.mlp.down_proj.weight",
+      "model.layers.2.mlp.down_proj.weight",
+      "model.layers.3.mlp.down_proj.weight"
+    ],
+    "facts_file": "C:\\Users\\runbo\\Downloads\\WeightX\\docs\\benchmarks\\facts_minillama.json",
+    "d_in": 172,
+    "d_out": 64,
+    "safetensors": null
+  },
+  "payload": "C:\\Users\\runbo\\Downloads\\WeightX\\docs\\benchmarks\\payload.json"
+}

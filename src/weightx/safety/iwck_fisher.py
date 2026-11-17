@@ -71,37 +71,46 @@ def compute_empirical_fisher(
             for name, param in model.named_parameters()
         }
         n_batches = 0
+        # Temporarily enable grads in case the caller froze model parameters for WeightWorkspace inference.
+        orig_req_grad = [(p, p.requires_grad) for p in model.parameters()]
+        for p, _ in orig_req_grad:
+            p.requires_grad_(True)
 
-        for batch in batches:
-            ids = batch.to(device)
-            if ids.ndim == 1:
-                ids = ids.unsqueeze(0)
-            model.zero_grad(set_to_none=True)
-            with torch.enable_grad():
-                out = model(ids)
-                logits = (
-                    out.logits
-                    if hasattr(out, "logits")
-                    else (out[0] if isinstance(out, tuple) else out)
-                )
-                if logits.ndim == 3 and logits.shape[1] > 1:
-                    shift_logits = logits[:, :-1, :].contiguous()
-                    shift_labels = ids[:, 1:].contiguous()
-                    loss = F.cross_entropy(
-                        shift_logits.view(-1, shift_logits.size(-1)),
-                        shift_labels.view(-1),
+        try:
+            for batch in batches:
+                ids = batch.to(device)
+                if ids.ndim == 1:
+                    ids = ids.unsqueeze(0)
+                model.zero_grad(set_to_none=True)
+                with torch.enable_grad():
+                    out = model(ids)
+                    logits = (
+                        out.logits
+                        if hasattr(out, "logits")
+                        else (out[0] if isinstance(out, tuple) else out)
                     )
-                else:
-                    loss = logits.float().pow(2).mean()
-                loss.backward()
+                    if logits.ndim == 3 and logits.shape[1] > 1:
+                        shift_logits = logits[:, :-1, :].contiguous()
+                        shift_labels = ids[:, 1:].contiguous()
+                        loss = F.cross_entropy(
+                            shift_logits.view(-1, shift_logits.size(-1)),
+                            shift_labels.view(-1),
+                        )
+                    else:
+                        loss = logits.float().pow(2).mean()
+                    loss.backward()
 
-            for name, param in model.named_parameters():
-                if param.grad is not None:
-                    g = param.grad.detach().float()
-                    accum[name].add_(g * g)
-            n_batches += 1
+                for name, param in model.named_parameters():
+                    if param.grad is not None:
+                        g = param.grad.detach().float()
+                        accum[name].add_(g * g)
+                n_batches += 1
 
-        model.zero_grad(set_to_none=True)
+            model.zero_grad(set_to_none=True)
+        finally:
+            for p, req in orig_req_grad:
+                p.requires_grad_(req)
+
         denom = float(max(1, n_batches))
         for name, tensor_f in accum.items():
             fisher[name] = (tensor_f / denom).cpu().numpy()

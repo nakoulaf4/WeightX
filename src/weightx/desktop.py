@@ -581,7 +581,14 @@ class _InteractiveNeuralBackground:
     def _tick(self) -> None:
         self.render_frame()
         if not getattr(self.app, "_destroyed", False):
-            self.app.after(34, self._tick)
+            job = getattr(self.app, "safe_after", None)
+            if callable(job):
+                job(34, self._tick)
+            else:
+                try:
+                    self.app.after(34, self._tick)
+                except (RuntimeError, tk.TclError):
+                    pass
 
 
 # ---------------------------------------------------------------------------
@@ -647,7 +654,7 @@ class WeightXApp(ctk.CTk):
             SessionRecord(
                 session_id="smollm2-bench",
                 title="SmolLM2-135M · −73% PPL",
-                subtitle="Domain MEMIT + Vespasian",
+                subtitle="Domain EAMIT + Vespasian",
                 messages=[
                     ConversationMessage(
                         role="user",
@@ -660,7 +667,7 @@ class WeightXApp(ctk.CTk):
                         body=(
                             "✓ [1/5] L1+L2 Bottleneck Recon — семейство=llama, слоёв=30, d_model=576\n"
                             "✓ [2/5] Outlier Conditioning — проверены выходные проекции down_proj (слои 27..29)\n"
-                            "✓ [3/5] Closed-Form Domain MEMIT — итеративная калибровка C0^-1 (шаги 0.35, 0.35)\n"
+                            "✓ [3/5] Closed-Form Domain EAMIT — итеративная калибровка C0^-1 с выравниванием эмбеддингов\n"
                             "✓ [4/5] KL & Control Guard — контрольный PPL 13.80 → 13.29 (−3.66%), KL = 0.0019 <= 0.05\n"
                             "✓ [5/5] Vespasian Commit — Held-Out PPL 317.93 → 85.83 (−73.0%), Top-1 Acc 25.24% → 35.24% (+10.0 п.п.)\n\n"
                             "Чекпоинт сохранён: checkpoints/smollm2-135m_weightx_improved.safetensors"
@@ -683,15 +690,46 @@ class WeightXApp(ctk.CTk):
         self.bind("<Control-n>", lambda _e: self.new_session())
         self.bind("<Escape>", lambda _e: self._close_all_popups())
 
-        self.after(80, lambda: _enable_windows_dark_caption(self))
-        self.after(120, self._boot_model_async)
-        self.after(100, self._drain_logs)
+        self.safe_after(80, lambda: _enable_windows_dark_caption(self))
+        self.safe_after(120, self._boot_model_async)
+        self.safe_after(100, self._drain_logs)
 
         if self._screenshot_path:
-            self.after(1450, self._capture_screenshots_and_exit)
+            self.safe_after(1450, self._capture_screenshots_and_exit)
+
+    def safe_after(self, delay_ms: int, callback: Callable[[], Any]) -> str | None:
+        """Schedule a Tkinter callback guarding against closed-loop or teardown races."""
+        if self._destroyed:
+            return None
+        jobs = getattr(self, "_scheduled_jobs", None)
+        if jobs is None:
+            jobs = set()
+            self._scheduled_jobs = jobs
+
+        def _wrapped() -> None:
+            if self._destroyed:
+                return
+            try:
+                callback()
+            except (RuntimeError, tk.TclError):
+                pass
+
+        try:
+            job_id = self.after(delay_ms, _wrapped)
+            jobs.add(job_id)
+            return job_id
+        except (RuntimeError, tk.TclError):
+            return None
 
     def _on_close(self) -> None:
         self._destroyed = True
+        for job_id in list(getattr(self, "_scheduled_jobs", ())):
+            try:
+                self.after_cancel(job_id)
+            except Exception:
+                pass
+        if hasattr(self, "_scheduled_jobs"):
+            self._scheduled_jobs.clear()
         self.destroy()
 
     def destroy(self) -> None:
@@ -797,14 +835,14 @@ class WeightXApp(ctk.CTk):
         except queue.Empty:
             pass
         if not self._destroyed:
-            self.after(90, self._drain_logs)
+            self.safe_after(90, self._drain_logs)
 
     def _boot_model_async(self) -> None:
         def _job() -> None:
             model_id = self.studio.config.model_id or "minillama-demo"
             self.studio.load_model(model_id)
             if not self._destroyed:
-                self.after(0, self._sync_model_badges)
+                self.safe_after(0, self._sync_model_badges)
 
         threading.Thread(target=_job, daemon=True).start()
 
@@ -1348,11 +1386,12 @@ class WeightXApp(ctk.CTk):
         self._build_shared_composer_and_pills()
         self._refresh_center_mode()
 
-    def _cycle_bg_mode(self) -> None:
+    def _cycle_bg_mode(self) -> str:
         label = self._bg_field.cycle_mode()
         self._hero_bg_pill.configure(text=f"✦ Фон: {label}")
         self._chat_top_bg_btn.configure(text=f"✦ {label}")
         self._set_status_caption(f"Интерактивный фон: {label} (кликните по фону для волны)")
+        return label
 
     def _build_hero_view(self) -> None:
         """Build DSH 1:1 `HeroShell` header (`[Logo 36px] WeightX (WSP)` + interactive workspace row)."""
@@ -1745,7 +1784,7 @@ class WeightXApp(ctk.CTk):
         def _load() -> None:
             self.studio.load_model(model_id)
             if not self._destroyed:
-                self.after(0, self._sync_model_badges)
+                self.safe_after(0, self._sync_model_badges)
 
         threading.Thread(target=_load, daemon=True).start()
 
@@ -2489,7 +2528,7 @@ class WeightXApp(ctk.CTk):
                 progress_lines.append("✓ " + line)
                 live_msg.body = "\n".join(progress_lines)
                 if not self._destroyed:
-                    self.after(0, self._render_conversation_messages)
+                    self.safe_after(0, self._render_conversation_messages)
 
             outcome_color = DSW_ACCENT
             try:
@@ -2504,14 +2543,14 @@ class WeightXApp(ctk.CTk):
                 body_parts.append(f"\nИтог: {res.summary}")
                 live_msg.body = "\n".join(body_parts)
                 if res.yaml_plan.strip() and not self._destroyed:
-                    self.after(0, lambda p=res.yaml_plan: self._set_yaml_editor(p))
+                    self.safe_after(0, lambda p=res.yaml_plan: self._set_yaml_editor(p))
             except Exception as exc:
                 live_msg.body = f"Ошибка выполнения скилла /skill {skill.skill_id}: {exc}"
                 outcome_color = DSW_ERROR
             finally:
                 self._busy = False
                 if not self._destroyed:
-                    self.after(0, lambda col=outcome_color: self._finish_turn(col))
+                    self.safe_after(0, lambda col=outcome_color: self._finish_turn(col))
 
         threading.Thread(target=_worker, daemon=True).start()
 
@@ -2570,7 +2609,7 @@ class WeightXApp(ctk.CTk):
             finally:
                 self._busy = False
                 if not self._destroyed:
-                    self.after(0, lambda c=col: self._finish_turn(c))
+                    self.safe_after(0, lambda c=col: self._finish_turn(c))
 
         threading.Thread(target=_bg, daemon=True).start()
 
@@ -2666,7 +2705,7 @@ class WeightXApp(ctk.CTk):
                 threading.Thread(
                     target=lambda: (
                         self.studio.load_model(chosen_model),
-                        self.after(0, self._sync_model_badges) if not self._destroyed else None,
+                        self.safe_after(0, self._sync_model_badges) if not self._destroyed else None,
                     ),
                     daemon=True,
                 ).start()

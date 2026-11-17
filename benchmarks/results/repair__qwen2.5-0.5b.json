@@ -1,0 +1,313 @@
+{
+  "model_id": "qwen2.5-0.5b",
+  "hf_repo_id": "Qwen/Qwen2.5-0.5B-Instruct",
+  "total_params": 494032768,
+  "load_time_s": 8.36,
+  "baseline_eval_time_s": 82.43,
+  "suite5_knowledge_map": {
+    "family": "decoder_transformer",
+    "num_layers": 24,
+    "d_model": 896,
+    "n_heads": 14,
+    "kci_overall": 0.6346,
+    "kci_per_domain": {
+      "factual": 0.6451,
+      "reasoning": 0.6282,
+      "syntactic": 0.6306
+    },
+    "concentration_regime": "concentrated_fragile",
+    "avg_crystallization_layer": 20.42,
+    "crystallization_fraction": 0.851,
+    "dominant_layers_by_domain": {
+      "factual": [
+        23,
+        21,
+        22
+      ],
+      "reasoning": [
+        23,
+        21,
+        22
+      ],
+      "syntactic": [
+        23,
+        22,
+        21
+      ]
+    },
+    "bottleneck_layers": [],
+    "redundant_layers": [
+      "layer_13",
+      "layer_18",
+      "layer_19"
+    ],
+    "natural_outlier_tensors": 65,
+    "max_natural_row_ratio": 10.75,
+    "mean_effective_rank": 560.57,
+    "mean_stable_rank": 86.74,
+    "max_weight_kurtosis": 7.55,
+    "profile_time_s": 48.79
+  },
+  "suite5_vespasian_guard": {
+    "target_tensor": "model.layers.12.mlp.down_proj.weight",
+    "sha256_before": "6eeacf9006742921",
+    "scale_attack_rolled_back": true,
+    "scale_attack_max_abs_diff": 0.0,
+    "scale_attack_sha256_match": true,
+    "nan_attack_rolled_back": true,
+    "nan_attack_nonfinite_detected": 1,
+    "nan_attack_sha256_match": true,
+    "noise_attack_rolled_back": true,
+    "noise_attack_kl_drift": 8.2138,
+    "noise_attack_sha256_match": true
+  },
+  "suite3_outlier_repair": {
+    "injected_tensor": "model.layers.15.mlp.down_proj.weight",
+    "injected_rows": [
+      23,
+      160,
+      761
+    ],
+    "scale_factors": [
+      16.0,
+      14.0,
+      12.0
+    ],
+    "localization_found_tensor": true,
+    "localization_row_recall": 1.0,
+    "clean": {
+      "wikitext2": {
+        "ppl": 14.0974,
+        "mean_nll": 2.64599,
+        "tokens_evaluated": 65535
+      },
+      "lambada": {
+        "acc": 0.4,
+        "word_ppl": 24.23,
+        "n_items": 400,
+        "exact_hits": 160
+      },
+      "arc_easy": {
+        "acc": 0.63,
+        "acc_norm": 0.6025,
+        "n_items": 400
+      }
+    },
+    "corrupted": {
+      "wikitext2": {
+        "ppl": 14.9545,
+        "mean_nll": 2.70501,
+        "tokens_evaluated": 65535
+      },
+      "lambada": {
+        "acc": 0.39,
+        "word_ppl": 28.232,
+        "n_items": 400,
+        "exact_hits": 156
+      },
+      "arc_easy": {
+        "acc": 0.605,
+        "acc_norm": 0.56,
+        "n_items": 400
+      }
+    },
+    "repaired_with_fisher": {
+      "wikitext2": {
+        "ppl": 14.0972,
+        "mean_nll": 2.64598,
+        "tokens_evaluated": 65535
+      },
+      "lambada": {
+        "acc": 0.4,
+        "word_ppl": 24.232,
+        "n_items": 400,
+        "exact_hits": 160
+      },
+      "arc_easy": {
+        "acc": 0.63,
+        "acc_norm": 0.6025,
+        "n_items": 400
+      }
+    },
+    "repaired_no_fisher": {
+      "wikitext2": {
+        "ppl": 14.0972,
+        "mean_nll": 2.64598,
+        "tokens_evaluated": 65535
+      },
+      "lambada": {
+        "acc": 0.4,
+        "word_ppl": 24.232,
+        "n_items": 400,
+        "exact_hits": 160
+      },
+      "arc_easy": {
+        "acc": 0.63,
+        "acc_norm": 0.6025,
+        "n_items": 400
+      }
+    },
+    "vespasian_accepted": true,
+    "changed_params": 14592,
+    "changed_pct": 0.00295,
+    "wt2_ppl_recovery_pct_fisher": 100.02,
+    "wt2_ppl_recovery_pct_no_fisher": 100.02,
+    "lambada_acc_recovery_pct_fisher": 100.0,
+    "repair_time_s": 89.452,
+    "plan_mutations": 1
+  },
+  "suite4_memory_slim": {
+    "clean_baseline": {
+      "wikitext2": {
+        "ppl": 14.0974,
+        "mean_nll": 2.64599,
+        "tokens_evaluated": 65535
+      },
+      "lambada": {
+        "acc": 0.4,
+        "word_ppl": 24.23,
+        "n_items": 400,
+        "exact_hits": 160
+      },
+      "arc_easy": {
+        "acc": 0.63,
+        "acc_norm": 0.6025,
+        "n_items": 400
+      }
+    },
+    "sweeps": [
+      {
+        "rank_ratio": 0.7,
+        "target_tensors": [
+          "model.layers.10.mlp.down_proj.weight",
+          "model.layers.13.mlp.down_proj.weight",
+          "model.layers.17.mlp.down_proj.weight",
+          "model.layers.20.mlp.down_proj.weight"
+        ],
+        "target_factorized_param_saving_pct": 17.13,
+        "total_model_param_saving_pct": 0.6,
+        "metrics": {
+          "wikitext2": {
+            "ppl": 14.944,
+            "mean_nll": 2.70431,
+            "tokens_evaluated": 65535
+          },
+          "lambada": {
+            "acc": 0.38,
+            "word_ppl": 30.745,
+            "n_items": 400,
+            "exact_hits": 152
+          },
+          "arc_easy": {
+            "acc": 0.61,
+            "acc_norm": 0.6025,
+            "n_items": 400
+          }
+        },
+        "wikitext2_ppl_delta_pct": 6.01,
+        "lambada_acc_delta": -0.02,
+        "arc_easy_acc_norm_delta": 0.0,
+        "elapsed_s": 158.62
+      },
+      {
+        "rank_ratio": 0.6,
+        "target_tensors": [
+          "model.layers.10.mlp.down_proj.weight",
+          "model.layers.13.mlp.down_proj.weight",
+          "model.layers.17.mlp.down_proj.weight",
+          "model.layers.20.mlp.down_proj.weight"
+        ],
+        "target_factorized_param_saving_pct": 28.89,
+        "total_model_param_saving_pct": 1.02,
+        "metrics": {
+          "wikitext2": {
+            "ppl": 15.4504,
+            "mean_nll": 2.73764,
+            "tokens_evaluated": 65535
+          },
+          "lambada": {
+            "acc": 0.365,
+            "word_ppl": 32.224,
+            "n_items": 400,
+            "exact_hits": 146
+          },
+          "arc_easy": {
+            "acc": 0.5975,
+            "acc_norm": 0.59,
+            "n_items": 400
+          }
+        },
+        "wikitext2_ppl_delta_pct": 9.6,
+        "lambada_acc_delta": -0.035,
+        "arc_easy_acc_norm_delta": -0.0125,
+        "elapsed_s": 159.81
+      },
+      {
+        "rank_ratio": 0.5,
+        "target_tensors": [
+          "model.layers.10.mlp.down_proj.weight",
+          "model.layers.13.mlp.down_proj.weight",
+          "model.layers.17.mlp.down_proj.weight",
+          "model.layers.20.mlp.down_proj.weight"
+        ],
+        "target_factorized_param_saving_pct": 40.79,
+        "total_model_param_saving_pct": 1.44,
+        "metrics": {
+          "wikitext2": {
+            "ppl": 16.1007,
+            "mean_nll": 2.77886,
+            "tokens_evaluated": 65535
+          },
+          "lambada": {
+            "acc": 0.3675,
+            "word_ppl": 35.889,
+            "n_items": 400,
+            "exact_hits": 147
+          },
+          "arc_easy": {
+            "acc": 0.595,
+            "acc_norm": 0.5725,
+            "n_items": 400
+          }
+        },
+        "wikitext2_ppl_delta_pct": 14.21,
+        "lambada_acc_delta": -0.0325,
+        "arc_easy_acc_norm_delta": -0.03,
+        "elapsed_s": 157.97
+      },
+      {
+        "rank_ratio": 0.4,
+        "target_tensors": [
+          "model.layers.10.mlp.down_proj.weight",
+          "model.layers.13.mlp.down_proj.weight",
+          "model.layers.17.mlp.down_proj.weight",
+          "model.layers.20.mlp.down_proj.weight"
+        ],
+        "target_factorized_param_saving_pct": 52.68,
+        "total_model_param_saving_pct": 1.86,
+        "metrics": {
+          "wikitext2": {
+            "ppl": 17.0012,
+            "mean_nll": 2.83329,
+            "tokens_evaluated": 65535
+          },
+          "lambada": {
+            "acc": 0.3375,
+            "word_ppl": 45.169,
+            "n_items": 400,
+            "exact_hits": 135
+          },
+          "arc_easy": {
+            "acc": 0.5825,
+            "acc_norm": 0.5575,
+            "n_items": 400
+          }
+        },
+        "wikitext2_ppl_delta_pct": 20.6,
+        "lambada_acc_delta": -0.0625,
+        "arc_easy_acc_norm_delta": -0.045,
+        "elapsed_s": 158.84
+      }
+    ]
+  }
+}

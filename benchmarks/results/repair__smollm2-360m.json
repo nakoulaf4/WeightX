@@ -1,0 +1,315 @@
+{
+  "model_id": "smollm2-360m",
+  "hf_repo_id": "HuggingFaceTB/SmolLM2-360M-Instruct",
+  "total_params": 361821120,
+  "load_time_s": 7.17,
+  "baseline_eval_time_s": 31.92,
+  "suite5_knowledge_map": {
+    "family": "decoder_transformer",
+    "num_layers": 32,
+    "d_model": 960,
+    "n_heads": 15,
+    "kci_overall": 0.5438,
+    "kci_per_domain": {
+      "factual": 0.5528,
+      "reasoning": 0.5192,
+      "syntactic": 0.5595
+    },
+    "concentration_regime": "concentrated_fragile",
+    "avg_crystallization_layer": 27.08,
+    "crystallization_fraction": 0.846,
+    "dominant_layers_by_domain": {
+      "factual": [
+        31,
+        30,
+        28
+      ],
+      "reasoning": [
+        31,
+        30,
+        29
+      ],
+      "syntactic": [
+        31,
+        30,
+        29
+      ]
+    },
+    "bottleneck_layers": [],
+    "redundant_layers": [
+      "layer_15",
+      "layer_16",
+      "layer_17",
+      "layer_18",
+      "layer_19"
+    ],
+    "natural_outlier_tensors": 70,
+    "max_natural_row_ratio": 7.447,
+    "mean_effective_rank": 648.04,
+    "mean_stable_rank": 94.58,
+    "max_weight_kurtosis": 25.56,
+    "profile_time_s": 54.44
+  },
+  "suite5_vespasian_guard": {
+    "target_tensor": "model.layers.16.mlp.down_proj.weight",
+    "sha256_before": "ff382e6efcbf353d",
+    "scale_attack_rolled_back": true,
+    "scale_attack_max_abs_diff": 0.0,
+    "scale_attack_sha256_match": true,
+    "nan_attack_rolled_back": true,
+    "nan_attack_nonfinite_detected": 1,
+    "nan_attack_sha256_match": true,
+    "noise_attack_rolled_back": true,
+    "noise_attack_kl_drift": 0.0996,
+    "noise_attack_sha256_match": true
+  },
+  "suite3_outlier_repair": {
+    "injected_tensor": "model.layers.20.mlp.down_proj.weight",
+    "injected_rows": [
+      25,
+      171,
+      816
+    ],
+    "scale_factors": [
+      16.0,
+      14.0,
+      12.0
+    ],
+    "localization_found_tensor": true,
+    "localization_row_recall": 1.0,
+    "clean": {
+      "wikitext2": {
+        "ppl": 12.4525,
+        "mean_nll": 2.52192,
+        "tokens_evaluated": 65535
+      },
+      "lambada": {
+        "acc": 0.425,
+        "word_ppl": 18.427,
+        "n_items": 400,
+        "exact_hits": 170
+      },
+      "arc_easy": {
+        "acc": 0.5625,
+        "acc_norm": 0.495,
+        "n_items": 400
+      }
+    },
+    "corrupted": {
+      "wikitext2": {
+        "ppl": 12.6632,
+        "mean_nll": 2.5387,
+        "tokens_evaluated": 65535
+      },
+      "lambada": {
+        "acc": 0.4175,
+        "word_ppl": 19.653,
+        "n_items": 400,
+        "exact_hits": 167
+      },
+      "arc_easy": {
+        "acc": 0.5575,
+        "acc_norm": 0.495,
+        "n_items": 400
+      }
+    },
+    "repaired_with_fisher": {
+      "wikitext2": {
+        "ppl": 12.4669,
+        "mean_nll": 2.52308,
+        "tokens_evaluated": 65535
+      },
+      "lambada": {
+        "acc": 0.425,
+        "word_ppl": 18.264,
+        "n_items": 400,
+        "exact_hits": 170
+      },
+      "arc_easy": {
+        "acc": 0.5675,
+        "acc_norm": 0.495,
+        "n_items": 400
+      }
+    },
+    "repaired_no_fisher": {
+      "wikitext2": {
+        "ppl": 12.4669,
+        "mean_nll": 2.52308,
+        "tokens_evaluated": 65535
+      },
+      "lambada": {
+        "acc": 0.425,
+        "word_ppl": 18.264,
+        "n_items": 400,
+        "exact_hits": 170
+      },
+      "arc_easy": {
+        "acc": 0.5675,
+        "acc_norm": 0.495,
+        "n_items": 400
+      }
+    },
+    "vespasian_accepted": true,
+    "changed_params": 10240,
+    "changed_pct": 0.00283,
+    "wt2_ppl_recovery_pct_fisher": 93.17,
+    "wt2_ppl_recovery_pct_no_fisher": 93.17,
+    "lambada_acc_recovery_pct_fisher": 100.0,
+    "repair_time_s": 34.723,
+    "plan_mutations": 1
+  },
+  "suite4_memory_slim": {
+    "clean_baseline": {
+      "wikitext2": {
+        "ppl": 12.4525,
+        "mean_nll": 2.52192,
+        "tokens_evaluated": 65535
+      },
+      "lambada": {
+        "acc": 0.425,
+        "word_ppl": 18.427,
+        "n_items": 400,
+        "exact_hits": 170
+      },
+      "arc_easy": {
+        "acc": 0.5625,
+        "acc_norm": 0.495,
+        "n_items": 400
+      }
+    },
+    "sweeps": [
+      {
+        "rank_ratio": 0.7,
+        "target_tensors": [
+          "model.layers.13.mlp.down_proj.weight",
+          "model.layers.18.mlp.down_proj.weight",
+          "model.layers.22.mlp.down_proj.weight",
+          "model.layers.27.mlp.down_proj.weight"
+        ],
+        "target_factorized_param_saving_pct": 3.75,
+        "total_model_param_saving_pct": 0.1,
+        "metrics": {
+          "wikitext2": {
+            "ppl": 13.6173,
+            "mean_nll": 2.61134,
+            "tokens_evaluated": 65535
+          },
+          "lambada": {
+            "acc": 0.41,
+            "word_ppl": 19.664,
+            "n_items": 400,
+            "exact_hits": 164
+          },
+          "arc_easy": {
+            "acc": 0.57,
+            "acc_norm": 0.51,
+            "n_items": 400
+          }
+        },
+        "wikitext2_ppl_delta_pct": 9.35,
+        "lambada_acc_delta": -0.015,
+        "arc_easy_acc_norm_delta": 0.015,
+        "elapsed_s": 75.05
+      },
+      {
+        "rank_ratio": 0.6,
+        "target_tensors": [
+          "model.layers.13.mlp.down_proj.weight",
+          "model.layers.18.mlp.down_proj.weight",
+          "model.layers.22.mlp.down_proj.weight",
+          "model.layers.27.mlp.down_proj.weight"
+        ],
+        "target_factorized_param_saving_pct": 17.5,
+        "total_model_param_saving_pct": 0.48,
+        "metrics": {
+          "wikitext2": {
+            "ppl": 15.1159,
+            "mean_nll": 2.71575,
+            "tokens_evaluated": 65535
+          },
+          "lambada": {
+            "acc": 0.4075,
+            "word_ppl": 21.469,
+            "n_items": 400,
+            "exact_hits": 163
+          },
+          "arc_easy": {
+            "acc": 0.5625,
+            "acc_norm": 0.5225,
+            "n_items": 400
+          }
+        },
+        "wikitext2_ppl_delta_pct": 21.39,
+        "lambada_acc_delta": -0.0175,
+        "arc_easy_acc_norm_delta": 0.0275,
+        "elapsed_s": 75.34
+      },
+      {
+        "rank_ratio": 0.5,
+        "target_tensors": [
+          "model.layers.13.mlp.down_proj.weight",
+          "model.layers.18.mlp.down_proj.weight",
+          "model.layers.22.mlp.down_proj.weight",
+          "model.layers.27.mlp.down_proj.weight"
+        ],
+        "target_factorized_param_saving_pct": 31.25,
+        "total_model_param_saving_pct": 0.85,
+        "metrics": {
+          "wikitext2": {
+            "ppl": 17.379,
+            "mean_nll": 2.85526,
+            "tokens_evaluated": 65535
+          },
+          "lambada": {
+            "acc": 0.405,
+            "word_ppl": 23.069,
+            "n_items": 400,
+            "exact_hits": 162
+          },
+          "arc_easy": {
+            "acc": 0.5625,
+            "acc_norm": 0.51,
+            "n_items": 400
+          }
+        },
+        "wikitext2_ppl_delta_pct": 39.56,
+        "lambada_acc_delta": -0.02,
+        "arc_easy_acc_norm_delta": 0.015,
+        "elapsed_s": 76.79
+      },
+      {
+        "rank_ratio": 0.4,
+        "target_tensors": [
+          "model.layers.13.mlp.down_proj.weight",
+          "model.layers.18.mlp.down_proj.weight",
+          "model.layers.22.mlp.down_proj.weight",
+          "model.layers.27.mlp.down_proj.weight"
+        ],
+        "target_factorized_param_saving_pct": 45.0,
+        "total_model_param_saving_pct": 1.22,
+        "metrics": {
+          "wikitext2": {
+            "ppl": 19.1853,
+            "mean_nll": 2.95414,
+            "tokens_evaluated": 65535
+          },
+          "lambada": {
+            "acc": 0.4025,
+            "word_ppl": 25.451,
+            "n_items": 400,
+            "exact_hits": 161
+          },
+          "arc_easy": {
+            "acc": 0.5425,
+            "acc_norm": 0.5325,
+            "n_items": 400
+          }
+        },
+        "wikitext2_ppl_delta_pct": 54.07,
+        "lambada_acc_delta": -0.0225,
+        "arc_easy_acc_norm_delta": 0.0375,
+        "elapsed_s": 75.55
+      }
+    ]
+  }
+}

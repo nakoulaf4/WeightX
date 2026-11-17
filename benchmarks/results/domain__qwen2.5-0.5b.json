@@ -1,0 +1,541 @@
+{
+  "model_id": "qwen2.5-0.5b",
+  "hf_repo_id": "Qwen/Qwen2.5-0.5B-Instruct",
+  "total_params": 494032768,
+  "load_time_s": 8.32,
+  "baseline_eval_time_s": 427.19,
+  "baseline": {
+    "general": {
+      "wikitext2": {
+        "ppl": 14.0974,
+        "mean_nll": 2.64599,
+        "tokens_evaluated": 65535
+      },
+      "lambada": {
+        "acc": 0.4,
+        "word_ppl": 24.23,
+        "n_items": 400,
+        "exact_hits": 160
+      },
+      "arc_easy": {
+        "acc": 0.63,
+        "acc_norm": 0.6025,
+        "n_items": 400
+      },
+      "hellaswag": {
+        "acc": 0.38,
+        "acc_norm": 0.4371,
+        "n_items": 350
+      }
+    },
+    "mbpp_test": {
+      "ppl": 4.1598,
+      "mean_nll": 1.42547,
+      "top1_acc": 0.6585,
+      "top5_acc": 0.8779,
+      "tokens": 14889
+    },
+    "humaneval_test": {
+      "ppl": 3.0141,
+      "mean_nll": 1.10331,
+      "top1_acc": 0.7297,
+      "top5_acc": 0.9079,
+      "tokens": 28235
+    },
+    "humaneval_pass1": {
+      "pass_at_1": 0.525,
+      "passed": 21,
+      "total": 40
+    },
+    "sciq_text": {
+      "ppl": 11.6313,
+      "mean_nll": 2.4537,
+      "top1_acc": 0.5171,
+      "top5_acc": 0.7527,
+      "tokens": 32309
+    },
+    "sciq_mc": {
+      "acc": 0.714,
+      "acc_norm": 0.64,
+      "n_items": 500
+    },
+    "wsp_held_out": {
+      "ppl": 406.2709,
+      "mean_nll": 6.00702,
+      "top1_acc": 0.2268,
+      "top5_acc": 0.4021,
+      "tokens": 194
+    },
+    "general_control": {
+      "ppl": 11.2313,
+      "mean_nll": 2.4187,
+      "top1_acc": 0.5032,
+      "top5_acc": 0.7677,
+      "tokens": 155
+    }
+  },
+  "track_code": {
+    "calibration": {
+      "elapsed_s": 107.953,
+      "edited_tensors": [
+        "model.layers.10.mlp.down_proj.weight",
+        "model.layers.13.mlp.down_proj.weight",
+        "model.layers.17.mlp.down_proj.weight",
+        "model.layers.20.mlp.down_proj.weight"
+      ],
+      "changed_params": 17432571,
+      "changed_pct": 3.5286,
+      "iterations_executed": 2,
+      "steps": [
+        {
+          "iteration": 1,
+          "layers": [
+            "model.layers.10.mlp.down_proj.weight",
+            "model.layers.13.mlp.down_proj.weight",
+            "model.layers.17.mlp.down_proj.weight",
+            "model.layers.20.mlp.down_proj.weight"
+          ],
+          "chosen_rel_step": 0.075,
+          "practice_nll_before": 1.83407,
+          "practice_nll_after": 0.60278,
+          "control_nll_before": 2.4187,
+          "control_nll_after": 2.41848,
+          "alignment_kl_before": 1.147752,
+          "alignment_kl_after": 0.719809,
+          "alignment_top_m_mse_before": 0.23667,
+          "alignment_top_m_mse_after": 0.135332
+        },
+        {
+          "iteration": 2,
+          "layers": [
+            "model.layers.10.mlp.down_proj.weight",
+            "model.layers.13.mlp.down_proj.weight",
+            "model.layers.17.mlp.down_proj.weight",
+            "model.layers.20.mlp.down_proj.weight"
+          ],
+          "chosen_rel_step": 0.075,
+          "practice_nll_before": 0.60278,
+          "practice_nll_after": 0.22328,
+          "control_nll_before": 2.41848,
+          "control_nll_after": 2.4179,
+          "alignment_kl_before": 1.072649,
+          "alignment_kl_after": 0.667359,
+          "alignment_top_m_mse_before": 0.202285,
+          "alignment_top_m_mse_after": 0.107126
+        }
+      ],
+      "vespasian_verdicts": [
+        "ACCEPTED & COMMITTED: held-out score improved 0.20643 -> 0.26496 (+0.05853), KL drift=0.0001 <= 0.05",
+        "REJECTED: held-out score 0.21776 did not improve over best 0.26496 (delta=-0.04719, required >= +0.0001) -> AUTOMATIC ROLLBACK to vespasian_best."
+      ]
+    },
+    "general_after": {
+      "wikitext2": {
+        "ppl": 14.163,
+        "mean_nll": 2.65063,
+        "tokens_evaluated": 65535
+      },
+      "lambada": {
+        "acc": 0.3925,
+        "word_ppl": 25.532,
+        "n_items": 400,
+        "exact_hits": 157
+      },
+      "arc_easy": {
+        "acc": 0.6225,
+        "acc_norm": 0.5975,
+        "n_items": 400
+      },
+      "hellaswag": {
+        "acc": 0.3714,
+        "acc_norm": 0.4457,
+        "n_items": 350
+      }
+    },
+    "mbpp_test_after": {
+      "ppl": 3.3515,
+      "mean_nll": 1.2094,
+      "top1_acc": 0.7134,
+      "top5_acc": 0.8958,
+      "tokens": 14889
+    },
+    "humaneval_test_after": {
+      "ppl": 3.058,
+      "mean_nll": 1.11776,
+      "top1_acc": 0.7266,
+      "top5_acc": 0.9054,
+      "tokens": 28235
+    },
+    "humaneval_pass1_after": {
+      "pass_at_1": 0.35,
+      "passed": 14,
+      "total": 40
+    },
+    "mbpp_ppl_change_pct": -19.43,
+    "humaneval_ppl_change_pct": 1.46,
+    "wikitext2_ppl_change_pct": 0.47
+  },
+  "track_sciq": {
+    "calibration": {
+      "elapsed_s": 113.505,
+      "edited_tensors": [
+        "model.layers.10.mlp.down_proj.weight",
+        "model.layers.13.mlp.down_proj.weight",
+        "model.layers.17.mlp.down_proj.weight",
+        "model.layers.20.mlp.down_proj.weight"
+      ],
+      "changed_params": 17432570,
+      "changed_pct": 3.5286,
+      "iterations_executed": 2,
+      "steps": [
+        {
+          "iteration": 1,
+          "layers": [
+            "model.layers.10.mlp.down_proj.weight",
+            "model.layers.13.mlp.down_proj.weight",
+            "model.layers.17.mlp.down_proj.weight",
+            "model.layers.20.mlp.down_proj.weight"
+          ],
+          "chosen_rel_step": 0.075,
+          "practice_nll_before": 2.67314,
+          "practice_nll_after": 1.02989,
+          "control_nll_before": 2.4187,
+          "control_nll_after": 2.41836,
+          "alignment_kl_before": 0.997469,
+          "alignment_kl_after": 0.588864,
+          "alignment_top_m_mse_before": 0.169815,
+          "alignment_top_m_mse_after": 0.106394
+        },
+        {
+          "iteration": 2,
+          "layers": [
+            "model.layers.10.mlp.down_proj.weight",
+            "model.layers.13.mlp.down_proj.weight",
+            "model.layers.17.mlp.down_proj.weight",
+            "model.layers.20.mlp.down_proj.weight"
+          ],
+          "chosen_rel_step": 0.075,
+          "practice_nll_before": 1.02989,
+          "practice_nll_after": 0.20391,
+          "control_nll_before": 2.41836,
+          "control_nll_after": 2.41815,
+          "alignment_kl_before": 0.965139,
+          "alignment_kl_after": 0.601304,
+          "alignment_top_m_mse_before": 0.147518,
+          "alignment_top_m_mse_after": 0.088463
+        }
+      ],
+      "vespasian_verdicts": [
+        "ACCEPTED & COMMITTED: held-out score improved 0.07918 -> 0.10755 (+0.02836), KL drift=0.0004 <= 0.05",
+        "REJECTED: held-out score 0.10447 did not improve over best 0.10755 (delta=-0.00308, required >= +0.0001) -> AUTOMATIC ROLLBACK to vespasian_best."
+      ]
+    },
+    "general_after": {
+      "wikitext2": {
+        "ppl": 14.1247,
+        "mean_nll": 2.64792,
+        "tokens_evaluated": 65535
+      },
+      "lambada": {
+        "acc": 0.4025,
+        "word_ppl": 24.197,
+        "n_items": 400,
+        "exact_hits": 161
+      },
+      "arc_easy": {
+        "acc": 0.63,
+        "acc_norm": 0.635,
+        "n_items": 400
+      },
+      "hellaswag": {
+        "acc": 0.38,
+        "acc_norm": 0.4429,
+        "n_items": 350
+      }
+    },
+    "sciq_text_after": {
+      "ppl": 8.8637,
+      "mean_nll": 2.18197,
+      "top1_acc": 0.5455,
+      "top5_acc": 0.7675,
+      "tokens": 32309
+    },
+    "sciq_mc_after": {
+      "acc": 0.74,
+      "acc_norm": 0.71,
+      "n_items": 500
+    },
+    "sciq_ppl_change_pct": -23.79,
+    "sciq_mc_acc_delta": 0.07,
+    "wikitext2_ppl_change_pct": 0.19
+  },
+  "track_wsp": {
+    "calibration": {
+      "elapsed_s": 150.145,
+      "edited_tensors": [
+        "model.layers.10.mlp.down_proj.weight",
+        "model.layers.13.mlp.down_proj.weight",
+        "model.layers.17.mlp.down_proj.weight",
+        "model.layers.20.mlp.down_proj.weight"
+      ],
+      "changed_params": 17432570,
+      "changed_pct": 3.5286,
+      "iterations_executed": 3,
+      "steps": [
+        {
+          "iteration": 1,
+          "layers": [
+            "model.layers.10.mlp.down_proj.weight",
+            "model.layers.13.mlp.down_proj.weight",
+            "model.layers.17.mlp.down_proj.weight",
+            "model.layers.20.mlp.down_proj.weight"
+          ],
+          "chosen_rel_step": 0.075,
+          "practice_nll_before": 5.51426,
+          "practice_nll_after": 3.70895,
+          "control_nll_before": 2.4187,
+          "control_nll_after": 2.41268,
+          "alignment_kl_before": 1.235186,
+          "alignment_kl_after": 0.716512,
+          "alignment_top_m_mse_before": 0.182066,
+          "alignment_top_m_mse_after": 0.113323
+        },
+        {
+          "iteration": 2,
+          "layers": [
+            "model.layers.10.mlp.down_proj.weight",
+            "model.layers.13.mlp.down_proj.weight",
+            "model.layers.17.mlp.down_proj.weight",
+            "model.layers.20.mlp.down_proj.weight"
+          ],
+          "chosen_rel_step": 0.075,
+          "practice_nll_before": 3.70895,
+          "practice_nll_after": 2.47813,
+          "control_nll_before": 2.41268,
+          "control_nll_after": 2.40746,
+          "alignment_kl_before": 1.202478,
+          "alignment_kl_after": 0.713433,
+          "alignment_top_m_mse_before": 0.180748,
+          "alignment_top_m_mse_after": 0.111673
+        },
+        {
+          "iteration": 3,
+          "layers": [
+            "model.layers.10.mlp.down_proj.weight",
+            "model.layers.13.mlp.down_proj.weight",
+            "model.layers.17.mlp.down_proj.weight",
+            "model.layers.20.mlp.down_proj.weight"
+          ],
+          "chosen_rel_step": 0.075,
+          "practice_nll_before": 2.47813,
+          "practice_nll_after": 1.57258,
+          "control_nll_before": 2.40746,
+          "control_nll_after": 2.40281,
+          "alignment_kl_before": 1.13063,
+          "alignment_kl_after": 0.673666,
+          "alignment_top_m_mse_before": 0.159299,
+          "alignment_top_m_mse_after": 0.09541
+        }
+      ],
+      "vespasian_verdicts": [
+        "ACCEPTED & COMMITTED: held-out score improved 0.00427 -> 0.00646 (+0.00219), KL drift=0.0004 <= 0.05",
+        "ACCEPTED & COMMITTED: held-out score improved 0.00646 -> 0.00876 (+0.00230), KL drift=0.0014 <= 0.05",
+        "ACCEPTED & COMMITTED: held-out score improved 0.00876 -> 0.01077 (+0.00201), KL drift=0.0029 <= 0.05"
+      ]
+    },
+    "general_after": {
+      "wikitext2": {
+        "ppl": 14.5378,
+        "mean_nll": 2.67675,
+        "tokens_evaluated": 65535
+      },
+      "lambada": {
+        "acc": 0.3925,
+        "word_ppl": 28.241,
+        "n_items": 400,
+        "exact_hits": 157
+      },
+      "arc_easy": {
+        "acc": 0.625,
+        "acc_norm": 0.6,
+        "n_items": 400
+      },
+      "hellaswag": {
+        "acc": 0.3714,
+        "acc_norm": 0.4371,
+        "n_items": 350
+      }
+    },
+    "wsp_held_out_after": {
+      "ppl": 143.2469,
+      "mean_nll": 4.96457,
+      "top1_acc": 0.3196,
+      "top5_acc": 0.5052,
+      "tokens": 194
+    },
+    "general_control_after": {
+      "ppl": 11.0543,
+      "mean_nll": 2.40282,
+      "top1_acc": 0.5032,
+      "top5_acc": 0.7677,
+      "tokens": 155
+    },
+    "wsp_ppl_reduction_pct": 64.74,
+    "control_ppl_change_pct": -1.58,
+    "wikitext2_ppl_change_pct": 3.12
+  },
+  "ablations": {
+    "unregularized_ridge": {
+      "calibration": {
+        "elapsed_s": 55.268,
+        "edited_tensors": [
+          "model.layers.10.mlp.down_proj.weight",
+          "model.layers.13.mlp.down_proj.weight",
+          "model.layers.17.mlp.down_proj.weight",
+          "model.layers.20.mlp.down_proj.weight"
+        ],
+        "changed_params": 17432567,
+        "changed_pct": 3.5286,
+        "iterations_executed": 2,
+        "steps": [
+          {
+            "iteration": 1,
+            "layers": [
+              "model.layers.10.mlp.down_proj.weight",
+              "model.layers.13.mlp.down_proj.weight",
+              "model.layers.17.mlp.down_proj.weight",
+              "model.layers.20.mlp.down_proj.weight"
+            ],
+            "chosen_rel_step": 0.05,
+            "practice_nll_before": 1.83407,
+            "practice_nll_after": 0.72209,
+            "control_nll_before": 2.4187,
+            "control_nll_after": 2.41253,
+            "alignment_kl_before": 1.147752,
+            "alignment_kl_after": 1.147752,
+            "alignment_top_m_mse_before": 0.23667,
+            "alignment_top_m_mse_after": 0.23667
+          },
+          {
+            "iteration": 2,
+            "layers": [
+              "model.layers.10.mlp.down_proj.weight",
+              "model.layers.13.mlp.down_proj.weight",
+              "model.layers.17.mlp.down_proj.weight",
+              "model.layers.20.mlp.down_proj.weight"
+            ],
+            "chosen_rel_step": 0.05,
+            "practice_nll_before": 0.72209,
+            "practice_nll_after": 0.24346,
+            "control_nll_before": 2.41253,
+            "control_nll_after": 2.41416,
+            "alignment_kl_before": 1.049448,
+            "alignment_kl_after": 1.049448,
+            "alignment_top_m_mse_before": 0.200546,
+            "alignment_top_m_mse_after": 0.200546
+          }
+        ],
+        "vespasian_verdicts": []
+      },
+      "general": {
+        "wikitext2": {
+          "ppl": 14.2606,
+          "mean_nll": 2.6575,
+          "tokens_evaluated": 65535
+        },
+        "lambada": {
+          "acc": 0.395,
+          "word_ppl": 25.759,
+          "n_items": 400,
+          "exact_hits": 158
+        },
+        "arc_easy": {
+          "acc": 0.62,
+          "acc_norm": 0.605,
+          "n_items": 400
+        },
+        "hellaswag": {
+          "acc": 0.38,
+          "acc_norm": 0.4571,
+          "n_items": 350
+        }
+      },
+      "mbpp_test": {
+        "ppl": 3.6778,
+        "mean_nll": 1.30233,
+        "top1_acc": 0.7148,
+        "top5_acc": 0.8919,
+        "tokens": 14889
+      },
+      "humaneval_test": {
+        "ppl": 3.11,
+        "mean_nll": 1.13462,
+        "top1_acc": 0.725,
+        "top5_acc": 0.9046,
+        "tokens": 28235
+      }
+    },
+    "adamw_sgd_4layer": {
+      "training": {
+        "elapsed_s": 13.13,
+        "epochs": 8,
+        "lr": 5e-05,
+        "edited_tensors": [
+          "model.layers.17.mlp.down_proj.weight",
+          "model.layers.20.mlp.down_proj.weight",
+          "model.layers.10.mlp.down_proj.weight",
+          "model.layers.13.mlp.down_proj.weight"
+        ],
+        "changed_params": 17432561,
+        "changed_pct": 3.5286,
+        "epoch_losses": [
+          1.6335,
+          0.8634,
+          0.455,
+          0.225,
+          0.158,
+          0.1364,
+          0.0946,
+          0.0912
+        ]
+      },
+      "general": {
+        "wikitext2": {
+          "ppl": 14.3533,
+          "mean_nll": 2.66398,
+          "tokens_evaluated": 65535
+        },
+        "lambada": {
+          "acc": 0.4125,
+          "word_ppl": 25.201,
+          "n_items": 400,
+          "exact_hits": 165
+        },
+        "arc_easy": {
+          "acc": 0.65,
+          "acc_norm": 0.615,
+          "n_items": 400
+        },
+        "hellaswag": {
+          "acc": 0.3857,
+          "acc_norm": 0.46,
+          "n_items": 350
+        }
+      },
+      "mbpp_test": {
+        "ppl": 7.2486,
+        "mean_nll": 1.98081,
+        "top1_acc": 0.7131,
+        "top5_acc": 0.8788,
+        "tokens": 14889
+      },
+      "humaneval_test": {
+        "ppl": 4.2804,
+        "mean_nll": 1.45406,
+        "top1_acc": 0.7109,
+        "top5_acc": 0.8906,
+        "tokens": 28235
+      }
+    }
+  }
+}

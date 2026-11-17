@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2026 WeightX Contributors
 """
-Publish WeightX to GitHub (`nakoulaf4/WeightX`) and upload Release v0.3.0 assets.
+Publish WeightX to GitHub (`nakoulaf4/WeightX`) and upload Release v0.4.0 assets.
 """
 
 from __future__ import annotations
@@ -24,7 +24,7 @@ DEFAULT_GIT_EXE = Path(
 TARGET_OWNER = "nakoulaf4"
 REPO_NAME = "WeightX"
 FULL_REPO = f"{TARGET_OWNER}/{REPO_NAME}"
-RELEASE_TAG = "v0.3.0"
+RELEASE_TAG = "v0.4.0"
 GITHUB_API = "https://api.github.com"
 
 
@@ -180,10 +180,31 @@ def sync_git_repo_and_push(git_exe: str, token: str) -> None:
     else:
         run_git(git_exe, "remote", "add", "origin", clean_remote_url)
 
-    run_git(git_exe, "add", "-A")
+    # Stage tracked updates and explicit WeightX project directories (never slurp unrelated local folders)
+    run_git(git_exe, "add", "-u")
+    project_paths = [
+        ".gitignore",
+        "LICENSE",
+        "README.md",
+        "pyproject.toml",
+        "Launch_WeightX.cmd",
+        "Launch_WeightX_CLI.cmd",
+        "assets",
+        "benchmarks",
+        "checkpoints",
+        "docs",
+        "examples",
+        "rust",
+        "scripts",
+        "src",
+        "tests",
+    ]
+    existing_paths = [p for p in project_paths if (ROOT / p).exists()]
+    if existing_paths:
+        run_git(git_exe, "add", "--", *existing_paths)
     diff_cached = run_git(git_exe, "diff", "--cached", "--quiet", check=False)
     if diff_cached.returncode != 0:
-        run_git(git_exe, "commit", "-m", f"WeightX {RELEASE_TAG}: DSH minimalist UI, 8 WSP skills, wx/weightx CLI")
+        run_git(git_exe, "commit", "-m", f"WeightX {RELEASE_TAG}: hybrid Rust+PyTorch core, EAMIT & model benchmarks")
 
     run_git(git_exe, "tag", "-f", RELEASE_TAG)
 
@@ -195,7 +216,6 @@ def sync_git_repo_and_push(git_exe: str, token: str) -> None:
         "push",
         auth_push_url,
         "main:main",
-        "--force",
         redact=token,
     )
     run_git(
@@ -214,16 +234,13 @@ def sync_git_repo_and_push(git_exe: str, token: str) -> None:
 
 
 def upsert_release_and_upload_assets(client: httpx.Client) -> str:
-    """Create/update GitHub release `v0.3.0` and upload release binaries."""
+    """Create/update GitHub release `v0.4.0` and upload release binaries."""
     release_body = (
         f"## WeightX {RELEASE_TAG}\n\n"
-        "- **DSH Minimalist Desktop UI**: 1:1 dark minimalist layout (`#151517` base, `#1B1B1C` collapsible sidebar, "
-        "`#2C2C2E` rounded composer card) under strict `WeightX` branding.\n"
-        "- **8 Built-in WSP Skills (2-Word Pills)**: `/coding-boost`, `/memory-slim`, `/outlier-repair`, "
-        "`/spectral-denoise`, `/memit-facts`, `/knowledge-map`, `/abliterate`, and `/vespasian-guard`.\n"
-        "- **Case-Insensitive CLI (`wx` / `weightx`)**: Works cleanly in PowerShell and CMD regardless of case (`wx`, `WX`, `weightx`, `WeightX`).\n"
-        "- **Separated GUI & CLI Windows Binaries**: Standalone `WeightX-v0.3.0-win64.exe` (Desktop GUI), "
-        "`wx-cli-v0.3.0-win64.exe` (CLI), portable ZIP, Python wheel, and improved `smollm2-135m` checkpoint.\n"
+        "- **Hybrid Rust + PyTorch Core**: Native Rust CLI (`wx`/`weightx`), Tauri Desktop, TOON, YAML plans, and persistent PyTorch/CUDA numeric sidecar.\n"
+        "- **EAMIT Batch & Domain Calibration**: Embedding-aligned closed-form editing (KL + top-M MSE + $C_0$ covariance preservation) with IWCKEdit Fisher Guard and Vespasian rollback.\n"
+        "- **Comprehensive Model Improvement Benchmarks**: Cross-architecture evaluations (SmolLM2-135M/360M, GPT-2 124M, Qwen2.5-0.5B, MiniLlama) across WikiText-2, LAMBADA, ARC-Easy, HellaSwag, SciQ, MBPP, HumanEval, and CounterFact (`docs/MODEL_BENCHMARKS.md`).\n"
+        "- **Windows Standalone Releases**: `WeightX-v0.4.0-win64.exe` (Desktop GUI), `wx-cli-v0.4.0-win64.exe` (CLI), portable ZIP, Python wheel, and improved `smollm2-135m` checkpoint.\n"
     )
 
     r_rel = client.get(f"{GITHUB_API}/repos/{FULL_REPO}/releases/tags/{RELEASE_TAG}")
@@ -261,7 +278,7 @@ def upsert_release_and_upload_assets(client: httpx.Client) -> str:
         (DIST / f"WeightX-{RELEASE_TAG}-win64-portable.zip", "application/zip"),
         (DIST / f"WeightX-{RELEASE_TAG}-win64.exe", "application/vnd.microsoft.portable-executable"),
         (DIST / f"wx-cli-{RELEASE_TAG}-win64.exe", "application/vnd.microsoft.portable-executable"),
-        (DIST / "weightx-0.3.0-py3-none-any.whl", "application/octet-stream"),
+        (DIST / "weightx-0.4.0-py3-none-any.whl", "application/octet-stream"),
         (ROOT / "checkpoints" / "smollm2-135m_weightx_improved.safetensors", "application/octet-stream"),
     ]
 

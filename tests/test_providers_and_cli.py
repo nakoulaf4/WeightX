@@ -105,5 +105,6 @@ def test_end_to_end_mvp_demo_cycle_and_rollback():
     run_res = summary["run_result"]
     assert run_res["final_best_held_out_score"] > run_res["baseline_held_out_score"] + 0.12
     assert summary["rollback_verdict"]["rolled_back"] is True
-    assert summary["memit_result"]["relative_error_reduction_pct"] > 70.0
+    assert summary["eamit_result"]["relative_error_reduction_pct"] > 70.0
+    assert summary["eamit_result"]["post_alignment_kl"] <= summary["eamit_result"]["pre_alignment_kl"]
     assert summary["toon_savings"]["token_reduction_pct"] > 30.0

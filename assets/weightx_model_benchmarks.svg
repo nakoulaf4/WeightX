@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="380" viewBox="0 0 880 380">
+<rect width="880" height="380" rx="12" fill="#151517" stroke="#2C2C2E" stroke-width="1.5"/>
+<text x="24" y="28" fill="#F9FAFB" font-family="Segoe UI, Arial, sans-serif" font-size="15.5" font-weight="600">WeightX Zero-SGD Domain Calibration — Held-Out Perplexity Reduction (%)</text>
+<g font-family="Segoe UI, Arial, sans-serif" font-size="11.5" fill="#A1A1AA">
+  <rect x="24" y="40" width="10" height="10" rx="2" fill="#7aaaff"/><text x="39" y="49">Code (MBPP Test)</text>
+  <rect x="165" y="40" width="10" height="10" rx="2" fill="#4ed17e"/><text x="180" y="49">SciQ Science QA</text>
+  <rect x="305" y="40" width="10" height="10" rx="2" fill="#f59e0b"/><text x="320" y="49">WSP Technical Held-Out</text>
+</g>
+<line x1="180.0" y1="68" x2="180.0" y2="330" stroke="#27272A" stroke-dasharray="3,3"/>
+<text x="180.0" y="348" text-anchor="middle" fill="#71717A" font-family="Consolas, monospace" font-size="11">0%</text>
+<line x1="306.0" y1="68" x2="306.0" y2="330" stroke="#27272A" stroke-dasharray="3,3"/>
+<text x="306.0" y="348" text-anchor="middle" fill="#71717A" font-family="Consolas, monospace" font-size="11">18%</text>
+<line x1="432.0" y1="68" x2="432.0" y2="330" stroke="#27272A" stroke-dasharray="3,3"/>
+<text x="432.0" y="348" text-anchor="middle" fill="#71717A" font-family="Consolas, monospace" font-size="11">36%</text>
+<line x1="558.0" y1="68" x2="558.0" y2="330" stroke="#27272A" stroke-dasharray="3,3"/>
+<text x="558.0" y="348" text-anchor="middle" fill="#71717A" font-family="Consolas, monospace" font-size="11">54%</text>
+<line x1="684.0" y1="68" x2="684.0" y2="330" stroke="#27272A" stroke-dasharray="3,3"/>
+<text x="684.0" y="348" text-anchor="middle" fill="#71717A" font-family="Consolas, monospace" font-size="11">72%</text>
+<line x1="810.0" y1="68" x2="810.0" y2="330" stroke="#27272A" stroke-dasharray="3,3"/>
+<text x="810.0" y="348" text-anchor="middle" fill="#71717A" font-family="Consolas, monospace" font-size="11">90%</text>
+<text x="168" y="97.0" text-anchor="end" fill="#E4E4E7" font-family="Consolas, monospace" font-size="12" font-weight="600">smollm2-135m</text>
+<rect x="180" y="74.0" width="168.7" height="12.8" rx="3" fill="#7aaaff"/>
+<text x="354.7" y="84.8" fill="#D4D4D8" font-family="Consolas, monospace" font-size="10.5">24.1%</text>
+<rect x="180" y="89.8" width="131.3" height="12.8" rx="3" fill="#4ed17e"/>
+<text x="317.3" y="100.6" fill="#D4D4D8" font-family="Consolas, monospace" font-size="10.5">18.8%</text>
+<rect x="180" y="105.6" width="515.5" height="12.8" rx="3" fill="#f59e0b"/>
+<text x="701.5" y="116.4" fill="#D4D4D8" font-family="Consolas, monospace" font-size="10.5">73.6%</text>
+<text x="168" y="149.4" text-anchor="end" fill="#E4E4E7" font-family="Consolas, monospace" font-size="12" font-weight="600">smollm2-135m-instruct</text>
+<rect x="180" y="126.4" width="195.2" height="12.8" rx="3" fill="#7aaaff"/>
+<text x="381.2" y="137.2" fill="#D4D4D8" font-family="Consolas, monospace" font-size="10.5">27.9%</text>
+<rect x="180" y="142.2" width="135.4" height="12.8" rx="3" fill="#4ed17e"/>
+<text x="321.4" y="153.0" fill="#D4D4D8" font-family="Consolas, monospace" font-size="10.5">19.3%</text>
+<rect x="180" y="158.0" width="503.5" height="12.8" rx="3" fill="#f59e0b"/>
+<text x="689.5" y="168.8" fill="#D4D4D8" font-family="Consolas, monospace" font-size="10.5">71.9%</text>
+<text x="168" y="201.8" text-anchor="end" fill="#E4E4E7" font-family="Consolas, monospace" font-size="12" font-weight="600">gpt2-124m</text>
+<rect x="180" y="178.8" width="472.8" height="12.8" rx="3" fill="#7aaaff"/>
+<text x="658.8" y="189.6" fill="#D4D4D8" font-family="Consolas, monospace" font-size="10.5">67.5%</text>
+<rect x="180" y="194.6" width="145.0" height="12.8" rx="3" fill="#4ed17e"/>
+<text x="331.0" y="205.4" fill="#D4D4D8" font-family="Consolas, monospace" font-size="10.5">20.7%</text>
+<rect x="180" y="210.4" width="562.2" height="12.8" rx="3" fill="#f59e0b"/>
+<text x="748.2" y="221.2" fill="#D4D4D8" font-family="Consolas, monospace" font-size="10.5">80.3%</text>
+<text x="168" y="254.2" text-anchor="end" fill="#E4E4E7" font-family="Consolas, monospace" font-size="12" font-weight="600">smollm2-360m</text>
+<rect x="180" y="231.2" width="191.5" height="12.8" rx="3" fill="#7aaaff"/>
+<text x="377.5" y="242.0" fill="#D4D4D8" font-family="Consolas, monospace" font-size="10.5">27.4%</text>
+<rect x="180" y="247.0" width="155.8" height="12.8" rx="3" fill="#4ed17e"/>
+<text x="341.8" y="257.8" fill="#D4D4D8" font-family="Consolas, monospace" font-size="10.5">22.2%</text>
+<rect x="180" y="262.8" width="2.0" height="12.8" rx="3" fill="#f59e0b"/>
+<text x="188.0" y="273.6" fill="#D4D4D8" font-family="Consolas, monospace" font-size="10.5">0.0% (KL gate rollback)</text>
+<text x="168" y="306.6" text-anchor="end" fill="#E4E4E7" font-family="Consolas, monospace" font-size="12" font-weight="600">qwen2.5-0.5b</text>
+<rect x="180" y="283.6" width="136.0" height="12.8" rx="3" fill="#7aaaff"/>
+<text x="322.0" y="294.4" fill="#D4D4D8" font-family="Consolas, monospace" font-size="10.5">19.4%</text>
+<rect x="180" y="299.4" width="166.5" height="12.8" rx="3" fill="#4ed17e"/>
+<text x="352.5" y="310.2" fill="#D4D4D8" font-family="Consolas, monospace" font-size="10.5">23.8%</text>
+<rect x="180" y="315.2" width="453.2" height="12.8" rx="3" fill="#f59e0b"/>
+<text x="639.2" y="326.0" fill="#D4D4D8" font-family="Consolas, monospace" font-size="10.5">64.7%</text>
+</svg>

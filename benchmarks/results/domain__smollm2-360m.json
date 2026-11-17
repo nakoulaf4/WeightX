@@ -1,0 +1,380 @@
+{
+  "model_id": "smollm2-360m",
+  "hf_repo_id": "HuggingFaceTB/SmolLM2-360M-Instruct",
+  "total_params": 361821120,
+  "load_time_s": 8.35,
+  "baseline_eval_time_s": 71.96,
+  "baseline": {
+    "general": {
+      "wikitext2": {
+        "ppl": 12.4525,
+        "mean_nll": 2.52192,
+        "tokens_evaluated": 65535
+      },
+      "lambada": {
+        "acc": 0.425,
+        "word_ppl": 18.427,
+        "n_items": 400,
+        "exact_hits": 170
+      },
+      "arc_easy": {
+        "acc": 0.5625,
+        "acc_norm": 0.495,
+        "n_items": 400
+      },
+      "hellaswag": {
+        "acc": 0.4114,
+        "acc_norm": 0.48,
+        "n_items": 350
+      }
+    },
+    "mbpp_test": {
+      "ppl": 5.0435,
+      "mean_nll": 1.6181,
+      "top1_acc": 0.6576,
+      "top5_acc": 0.8639,
+      "tokens": 17083
+    },
+    "humaneval_test": {
+      "ppl": 4.0449,
+      "mean_nll": 1.39745,
+      "top1_acc": 0.674,
+      "top5_acc": 0.88,
+      "tokens": 29516
+    },
+    "humaneval_pass1": null,
+    "sciq_text": {
+      "ppl": 12.2573,
+      "mean_nll": 2.50612,
+      "top1_acc": 0.5112,
+      "top5_acc": 0.7517,
+      "tokens": 32538
+    },
+    "sciq_mc": {
+      "acc": 0.598,
+      "acc_norm": 0.54,
+      "n_items": 500
+    },
+    "wsp_held_out": {
+      "ppl": 360.8314,
+      "mean_nll": 5.88841,
+      "top1_acc": 0.2381,
+      "top5_acc": 0.4,
+      "tokens": 210
+    },
+    "general_control": {
+      "ppl": 24.3591,
+      "mean_nll": 3.19291,
+      "top1_acc": 0.4,
+      "top5_acc": 0.6788,
+      "tokens": 165
+    }
+  },
+  "track_code": {
+    "calibration": {
+      "elapsed_s": 149.347,
+      "edited_tensors": [
+        "model.layers.13.mlp.down_proj.weight",
+        "model.layers.18.mlp.down_proj.weight",
+        "model.layers.22.mlp.down_proj.weight",
+        "model.layers.27.mlp.down_proj.weight"
+      ],
+      "changed_params": 9830397,
+      "changed_pct": 2.7169,
+      "iterations_executed": 3,
+      "steps": [
+        {
+          "iteration": 1,
+          "layers": [
+            "model.layers.13.mlp.down_proj.weight",
+            "model.layers.18.mlp.down_proj.weight",
+            "model.layers.22.mlp.down_proj.weight",
+            "model.layers.27.mlp.down_proj.weight"
+          ],
+          "chosen_rel_step": 0.075,
+          "practice_nll_before": 2.10366,
+          "practice_nll_after": 1.09588,
+          "control_nll_before": 3.19291,
+          "control_nll_after": 3.19162,
+          "alignment_kl_before": 1.183315,
+          "alignment_kl_after": 0.702197,
+          "alignment_top_m_mse_before": 0.228597,
+          "alignment_top_m_mse_after": 0.127522
+        },
+        {
+          "iteration": 2,
+          "layers": [
+            "model.layers.13.mlp.down_proj.weight",
+            "model.layers.18.mlp.down_proj.weight",
+            "model.layers.22.mlp.down_proj.weight",
+            "model.layers.27.mlp.down_proj.weight"
+          ],
+          "chosen_rel_step": 0.075,
+          "practice_nll_before": 1.09588,
+          "practice_nll_after": 0.50697,
+          "control_nll_before": 3.19162,
+          "control_nll_after": 3.18972,
+          "alignment_kl_before": 1.183159,
+          "alignment_kl_after": 0.704658,
+          "alignment_top_m_mse_before": 0.226403,
+          "alignment_top_m_mse_after": 0.120933
+        },
+        {
+          "iteration": 3,
+          "layers": [
+            "model.layers.13.mlp.down_proj.weight",
+            "model.layers.18.mlp.down_proj.weight",
+            "model.layers.22.mlp.down_proj.weight",
+            "model.layers.27.mlp.down_proj.weight"
+          ],
+          "chosen_rel_step": 0.075,
+          "practice_nll_before": 0.50697,
+          "practice_nll_after": 0.22914,
+          "control_nll_before": 3.18972,
+          "control_nll_after": 3.18695,
+          "alignment_kl_before": 1.160126,
+          "alignment_kl_after": 0.690121,
+          "alignment_top_m_mse_before": 0.205777,
+          "alignment_top_m_mse_after": 0.104072
+        }
+      ],
+      "vespasian_verdicts": [
+        "ACCEPTED & COMMITTED: held-out score improved 0.15523 -> 0.20152 (+0.04629), KL drift=0.0001 <= 0.05",
+        "ACCEPTED & COMMITTED: held-out score improved 0.20152 -> 0.22591 (+0.02439), KL drift=0.0006 <= 0.05",
+        "REJECTED: held-out score 0.22184 did not improve over best 0.22591 (delta=-0.00406, required >= +0.0001) -> AUTOMATIC ROLLBACK to vespasian_best."
+      ]
+    },
+    "general_after": {
+      "wikitext2": {
+        "ppl": 12.5351,
+        "mean_nll": 2.52853,
+        "tokens_evaluated": 65535
+      },
+      "lambada": {
+        "acc": 0.41,
+        "word_ppl": 19.903,
+        "n_items": 400,
+        "exact_hits": 164
+      },
+      "arc_easy": {
+        "acc": 0.55,
+        "acc_norm": 0.505,
+        "n_items": 400
+      },
+      "hellaswag": {
+        "acc": 0.4,
+        "acc_norm": 0.4886,
+        "n_items": 350
+      }
+    },
+    "mbpp_test_after": {
+      "ppl": 3.6636,
+      "mean_nll": 1.29845,
+      "top1_acc": 0.7112,
+      "top5_acc": 0.8916,
+      "tokens": 17083
+    },
+    "humaneval_test_after": {
+      "ppl": 4.1083,
+      "mean_nll": 1.41302,
+      "top1_acc": 0.6732,
+      "top5_acc": 0.8793,
+      "tokens": 29516
+    },
+    "humaneval_pass1_after": null,
+    "mbpp_ppl_change_pct": -27.36,
+    "humaneval_ppl_change_pct": 1.57,
+    "wikitext2_ppl_change_pct": 0.66
+  },
+  "track_sciq": {
+    "calibration": {
+      "elapsed_s": 150.684,
+      "edited_tensors": [
+        "model.layers.13.mlp.down_proj.weight",
+        "model.layers.18.mlp.down_proj.weight",
+        "model.layers.22.mlp.down_proj.weight",
+        "model.layers.27.mlp.down_proj.weight"
+      ],
+      "changed_params": 9830399,
+      "changed_pct": 2.7169,
+      "iterations_executed": 3,
+      "steps": [
+        {
+          "iteration": 1,
+          "layers": [
+            "model.layers.13.mlp.down_proj.weight",
+            "model.layers.18.mlp.down_proj.weight",
+            "model.layers.22.mlp.down_proj.weight",
+            "model.layers.27.mlp.down_proj.weight"
+          ],
+          "chosen_rel_step": 0.075,
+          "practice_nll_before": 2.75545,
+          "practice_nll_after": 1.49774,
+          "control_nll_before": 3.19291,
+          "control_nll_after": 3.18984,
+          "alignment_kl_before": 0.999835,
+          "alignment_kl_after": 0.592464,
+          "alignment_top_m_mse_before": 0.154813,
+          "alignment_top_m_mse_after": 0.092816
+        },
+        {
+          "iteration": 2,
+          "layers": [
+            "model.layers.13.mlp.down_proj.weight",
+            "model.layers.18.mlp.down_proj.weight",
+            "model.layers.22.mlp.down_proj.weight",
+            "model.layers.27.mlp.down_proj.weight"
+          ],
+          "chosen_rel_step": 0.075,
+          "practice_nll_before": 1.49774,
+          "practice_nll_after": 0.66887,
+          "control_nll_before": 3.18984,
+          "control_nll_after": 3.18511,
+          "alignment_kl_before": 0.991486,
+          "alignment_kl_after": 0.607006,
+          "alignment_top_m_mse_before": 0.147752,
+          "alignment_top_m_mse_after": 0.08637
+        },
+        {
+          "iteration": 3,
+          "layers": [
+            "model.layers.13.mlp.down_proj.weight",
+            "model.layers.18.mlp.down_proj.weight",
+            "model.layers.22.mlp.down_proj.weight",
+            "model.layers.27.mlp.down_proj.weight"
+          ],
+          "chosen_rel_step": 0.075,
+          "practice_nll_before": 0.66887,
+          "practice_nll_after": 0.34938,
+          "control_nll_before": 3.18511,
+          "control_nll_after": 3.17623,
+          "alignment_kl_before": 1.111336,
+          "alignment_kl_after": 0.648142,
+          "alignment_top_m_mse_before": 0.149544,
+          "alignment_top_m_mse_after": 0.080345
+        }
+      ],
+      "vespasian_verdicts": [
+        "ACCEPTED & COMMITTED: held-out score improved 0.07561 -> 0.09218 (+0.01657), KL drift=0.0001 <= 0.05",
+        "ACCEPTED & COMMITTED: held-out score improved 0.09218 -> 0.10103 (+0.00885), KL drift=0.0004 <= 0.05",
+        "REJECTED: held-out score 0.09471 did not improve over best 0.10103 (delta=-0.00632, required >= +0.0001) -> AUTOMATIC ROLLBACK to vespasian_best."
+      ]
+    },
+    "general_after": {
+      "wikitext2": {
+        "ppl": 12.5909,
+        "mean_nll": 2.53297,
+        "tokens_evaluated": 65535
+      },
+      "lambada": {
+        "acc": 0.42,
+        "word_ppl": 18.307,
+        "n_items": 400,
+        "exact_hits": 168
+      },
+      "arc_easy": {
+        "acc": 0.6375,
+        "acc_norm": 0.5975,
+        "n_items": 400
+      },
+      "hellaswag": {
+        "acc": 0.3971,
+        "acc_norm": 0.4829,
+        "n_items": 350
+      }
+    },
+    "sciq_text_after": {
+      "ppl": 9.5295,
+      "mean_nll": 2.25439,
+      "top1_acc": 0.5499,
+      "top5_acc": 0.7683,
+      "tokens": 32538
+    },
+    "sciq_mc_after": {
+      "acc": 0.662,
+      "acc_norm": 0.648,
+      "n_items": 500
+    },
+    "sciq_ppl_change_pct": -22.25,
+    "sciq_mc_acc_delta": 0.108,
+    "wikitext2_ppl_change_pct": 1.11
+  },
+  "track_wsp": {
+    "calibration": {
+      "elapsed_s": 46.074,
+      "edited_tensors": [
+        "model.layers.13.mlp.down_proj.weight",
+        "model.layers.18.mlp.down_proj.weight",
+        "model.layers.22.mlp.down_proj.weight",
+        "model.layers.27.mlp.down_proj.weight"
+      ],
+      "changed_params": 0,
+      "changed_pct": 0.0,
+      "iterations_executed": 1,
+      "steps": [
+        {
+          "iteration": 1,
+          "layers": [
+            "model.layers.13.mlp.down_proj.weight",
+            "model.layers.18.mlp.down_proj.weight",
+            "model.layers.22.mlp.down_proj.weight",
+            "model.layers.27.mlp.down_proj.weight"
+          ],
+          "chosen_rel_step": 0.075,
+          "practice_nll_before": 5.67409,
+          "practice_nll_after": 2.95787,
+          "control_nll_before": 3.19291,
+          "control_nll_after": 3.0611,
+          "alignment_kl_before": 1.069241,
+          "alignment_kl_after": 0.548868,
+          "alignment_top_m_mse_before": 0.175379,
+          "alignment_top_m_mse_after": 0.105291
+        }
+      ],
+      "vespasian_verdicts": [
+        "REJECTED: reference KL divergence 0.0561 exceeds locality limit 0.0500 -> AUTOMATIC ROLLBACK to vespasian_best."
+      ]
+    },
+    "general_after": {
+      "wikitext2": {
+        "ppl": 12.4525,
+        "mean_nll": 2.52192,
+        "tokens_evaluated": 65535
+      },
+      "lambada": {
+        "acc": 0.425,
+        "word_ppl": 18.427,
+        "n_items": 400,
+        "exact_hits": 170
+      },
+      "arc_easy": {
+        "acc": 0.5625,
+        "acc_norm": 0.495,
+        "n_items": 400
+      },
+      "hellaswag": {
+        "acc": 0.4114,
+        "acc_norm": 0.48,
+        "n_items": 350
+      }
+    },
+    "wsp_held_out_after": {
+      "ppl": 360.8314,
+      "mean_nll": 5.88841,
+      "top1_acc": 0.2381,
+      "top5_acc": 0.4,
+      "tokens": 210
+    },
+    "general_control_after": {
+      "ppl": 24.3591,
+      "mean_nll": 3.19291,
+      "top1_acc": 0.4,
+      "top5_acc": 0.6788,
+      "tokens": 165
+    },
+    "wsp_ppl_reduction_pct": 0.0,
+    "control_ppl_change_pct": 0.0,
+    "wikitext2_ppl_change_pct": 0.0
+  },
+  "ablations": null
+}

@@ -59,7 +59,7 @@ BANNER_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 220" wi
   <rect x="454" y="68" width="58" height="26" rx="13" fill="#283142"/>
   <text x="483" y="86" text-anchor="middle" fill="#7AAAFF" font-family="Consolas, monospace" font-size="13" font-weight="700">WSP</text>
   <text x="250" y="138" fill="#CFD3D6" font-family="Segoe UI, Inter, system-ui, sans-serif" font-size="18">Open-Source Weight-Space Programming Harness for LLMs (GPLv3)</text>
-  <text x="250" y="170" fill="#81858C" font-family="Consolas, monospace" font-size="13">L1 AutoArch  ·  L2 Uni-Layer &amp; Knowledge Map  ·  L3 BrainSurgery-WX &amp; MEMIT-MASS  ·  Vespasian Rollback</text>
+  <text x="250" y="170" fill="#81858C" font-family="Consolas, monospace" font-size="13">L1 AutoArch  ·  L2 Uni-Layer &amp; Knowledge Map  ·  L3 BrainSurgery-WX &amp; EAMIT  ·  Vespasian Rollback</text>
 </svg>
 """
 
@@ -155,17 +155,9 @@ def install_global_cli_shims(project_root: Path, python_exe: Path) -> list[str]:
     cli_dist = project_root / "dist" / "cli"
     try:
         user_bin.mkdir(parents=True, exist_ok=True)
-        shim_body = (
-            "@echo off\r\n"
-            "chcp 65001 >nul\r\n"
-            f'"{python_exe}" -m weightx.cli %*\r\n'
-        )
-        for name in ("wx.cmd", "weightx.cmd"):
-            target = user_bin / name
-            target.write_text(shim_body, encoding="utf-8")
-            installed.append(str(target))
 
-        # Copy native wx.exe and weightx.exe if present in dist/cli/
+        # Copy native wx.exe and weightx.exe if present in dist/cli/ (hybrid v0.4.0+).
+        native_wx = cli_dist / "wx.exe"
         for exe_name in ("wx.exe", "weightx.exe"):
             src_exe = cli_dist / exe_name
             if src_exe.exists():
@@ -175,6 +167,27 @@ def install_global_cli_shims(project_root: Path, python_exe: Path) -> list[str]:
                     installed.append(str(dst_exe))
                 except Exception:
                     pass
+
+        # .cmd wrappers: native binary when available, legacy Python CLI otherwise.
+        if native_wx.exists():
+            shim_body = (
+                "@echo off\r\n"
+                "chcp 65001 >nul\r\n"
+                f'"{user_bin / "wx.exe"}" %*\r\n'
+            )
+            profile_wx = str(user_bin / "wx.exe")
+            profile_call = f"& '{profile_wx}' @args"
+        else:
+            shim_body = (
+                "@echo off\r\n"
+                "chcp 65001 >nul\r\n"
+                f'"{python_exe}" -m weightx.cli %*\r\n'
+            )
+            profile_call = f"& '{python_exe}' -m weightx.cli @args"
+        for name in ("wx.cmd", "weightx.cmd"):
+            target = user_bin / name
+            target.write_text(shim_body, encoding="utf-8")
+            installed.append(str(target))
 
         # Ensure user_bin is in HKCU\Environment\Path (never put GUI folder in PATH)
         ps_path_cmd = (
@@ -187,10 +200,12 @@ def install_global_cli_shims(project_root: Path, python_exe: Path) -> list[str]:
             "if ($PROFILE) { "
             "  $pdir = Split-Path -Parent $PROFILE; "
             "  if (-not (Test-Path $pdir)) { New-Item -ItemType Directory -Path $pdir -Force | Out-Null }; "
-            f"  $fn = \"`n# WeightX CLI (case-insensitive wx / weightx)`nfunction global:wx {{ & '{python_exe}' -m weightx.cli @args }}`nfunction global:weightx {{ & '{python_exe}' -m weightx.cli @args }}`n\"; "
-            "  if (-not (Test-Path $PROFILE) -or -not ((Get-Content $PROFILE -Raw -ErrorAction SilentlyContinue) -match 'weightx\\.cli')) { "
-            "    Add-Content -Path $PROFILE -Value $fn -Encoding UTF8 "
-            "  } "
+            f"  $fn = \"`n# WeightX CLI (case-insensitive wx / weightx)`nfunction global:wx {{ {profile_call} }}`nfunction global:weightx {{ {profile_call} }}`n\"; "
+            "  if (Test-Path $PROFILE) { "
+            "    $c = Get-Content $PROFILE -Raw -ErrorAction SilentlyContinue; "
+            "    if ($c) { $c = $c -replace '(?m)^# WeightX CLI[^\n]*\nfunction global:wx[^\n]*\nfunction global:weightx[^\n]*\n?', ''; Set-Content -Path $PROFILE -Value $c -Encoding UTF8 -NoNewline } "
+            "  }; "
+            "  Add-Content -Path $PROFILE -Value $fn -Encoding UTF8 "
             "}"
         )
         subprocess.run(
@@ -231,22 +246,43 @@ def install_desktop_shortcut(desktop_dir: Path | str | None = None) -> dict[str,
                 except Exception:
                     pass
 
-    # Project-root launchers
-    cmd_gui = (
-        "@echo off\r\n"
-        "chcp 65001 >nul\r\n"
-        f'cd /d "{project_root}"\r\n'
-        f'start "" "{gui_launcher_exe}" -m weightx.desktop\r\n'
-    )
+    # Project-root launchers: native hybrid binaries when present (v0.4.0+),
+    # legacy Python desktop/CLI otherwise.
+    native_gui = project_root / "dist" / "gui" / "WeightX.exe"
+    native_cli = project_root / "dist" / "cli" / "wx.exe"
+    if native_gui.exists():
+        cmd_gui = (
+            "@echo off\r\n"
+            "rem WeightX hybrid — Tauri desktop (Rust core + PyTorch sidecar)\r\n"
+            "chcp 65001 >nul\r\n"
+            f'cd /d "{project_root}"\r\n'
+            f'start "" "{native_gui}" %*\r\n'
+        )
+    else:
+        cmd_gui = (
+            "@echo off\r\n"
+            "chcp 65001 >nul\r\n"
+            f'cd /d "{project_root}"\r\n'
+            f'start "" "{gui_launcher_exe}" -m weightx.desktop\r\n'
+        )
     local_gui_cmd = project_root / "Launch_WeightX.cmd"
     local_gui_cmd.write_text(cmd_gui, encoding="utf-8")
 
-    cmd_cli = (
-        "@echo off\r\n"
-        "chcp 65001 >nul\r\n"
-        f'cd /d "{project_root}"\r\n'
-        f'"{python_exe}" -m weightx.cli chat\r\n'
-    )
+    if native_cli.exists():
+        cmd_cli = (
+            "@echo off\r\n"
+            "rem WeightX hybrid — interactive CLI (Rust core + PyTorch sidecar)\r\n"
+            "chcp 65001 >nul\r\n"
+            f'cd /d "{project_root}"\r\n'
+            f'"{native_cli}" chat %*\r\n'
+        )
+    else:
+        cmd_cli = (
+            "@echo off\r\n"
+            "chcp 65001 >nul\r\n"
+            f'cd /d "{project_root}"\r\n'
+            f'"{python_exe}" -m weightx.cli chat\r\n'
+        )
     local_cli_cmd = project_root / "Launch_WeightX_CLI.cmd"
     local_cli_cmd.write_text(cmd_cli, encoding="utf-8")
 

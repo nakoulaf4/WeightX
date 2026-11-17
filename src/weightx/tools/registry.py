@@ -5,7 +5,7 @@ WeightX Isolated Tool Layer (`ToolRegistry` & `@weightx_tool`).
 
 Provides the LLM with a strictly typed, JSON-Schema-documented set of tools across
 L1 (AutoArch), L2 (Uni-Layer 13-metric profiler & Knowledge Map / KCI), L3 (Tensor
-list/describe/slice, BrainSurgery-WX declarative YAML plans, MEMIT-MASS batch editing,
+list/describe/slice, BrainSurgery-WX declarative YAML plans, EAMIT batch editing,
 isolated sandbox), and Verification (practice probe & Vespasian held-out commit/rollback).
 
 The LLM never receives direct access to the host filesystem, the `torch.nn.Module`
@@ -30,7 +30,7 @@ from weightx.execution.vespasian import VespasianEngine
 from weightx.l1_arch.autoarch import inspect_architecture
 from weightx.l2_profile.knowledge_map import run_knowledge_map
 from weightx.l2_profile.unilayer import profile_model_layers
-from weightx.l3_weights.memit_mass import BatchFactSpec, apply_memit_mass_batch
+from weightx.l3_weights.eamit import BatchFactSpec, EamitAlignConfig, apply_eamit_batch
 from weightx.l3_weights.workspace import WeightWorkspace
 from weightx.toon_io import dumps_toon
 
@@ -326,7 +326,7 @@ def build_default_tool_registry(
     # 7. L3 Declarative BrainSurgery-WX YAML Plan
     @weightx_tool(
         "l3_apply_yaml_plan",
-        "Validate and apply a declarative BrainSurgery-WX YAML plan. The plan MUST include `assert` steps (shape, dtype, norm, finite) and can use transforms like `rescale_outlier_rows_`, `scale_`, `fill_`, `clamp_`, `phlora_`, `closed_form_ridge_`, or `memit_mass_`.",
+        "Validate and apply a declarative BrainSurgery-WX YAML plan. The plan MUST include `assert` steps (shape, dtype, norm, finite) and can use transforms like `rescale_outlier_rows_`, `scale_`, `fill_`, `clamp_`, `phlora_`, `closed_form_ridge_`, or `eamit_batch_`.",
         layer="L3",
         parallel_safe=False,
         plan_yaml={
@@ -349,10 +349,10 @@ def build_default_tool_registry(
         )
         return rep.to_dict()
 
-    # 8. L3 MEMIT-MASS Batch Editing
+    # 8. L3 EAMIT Batch Editing
     @weightx_tool(
-        "l3_batch_edit_memit",
-        "Apply MEMIT-MASS simultaneous batch associative memory editing across one or more 2D layer matrices with IWCKEdit Fisher regularization.",
+        "l3_batch_edit_eamit",
+        "Apply EAMIT (Embedding Alignment Model Editing in Transformers) simultaneous batch associative memory editing across one or more 2D layer matrices with KL + top-M similarity alignment and IWCKEdit Fisher regularization.",
         layer="L3",
         parallel_safe=False,
         target_tensors={
@@ -370,11 +370,35 @@ def build_default_tool_registry(
             "description": "Covariance regularization strength (default 0.01).",
             "optional": True,
         },
+        lambda_kl={
+            "type": "number",
+            "description": "Key-residual KL alignment regularization weight (default 0.05).",
+            "optional": True,
+        },
+        lambda_mse={
+            "type": "number",
+            "description": "Top-M cosine-similarity MSE alignment weight (default 0.25).",
+            "optional": True,
+        },
+        top_m={
+            "type": "integer",
+            "description": "Number of top key-similar neighbors per item for MSE alignment (default 8).",
+            "optional": True,
+        },
+        align_steps={
+            "type": "integer",
+            "description": "Number of embedding alignment optimization iterations (default 20).",
+            "optional": True,
+        },
     )
-    def _l3_memit(
+    def _l3_eamit(
         target_tensors: list[str],
         facts: list[dict[str, Any]],
         lambda_cov: float = 1e-2,
+        lambda_kl: float = 0.05,
+        lambda_mse: float = 0.25,
+        top_m: int = 8,
+        align_steps: int = 20,
     ) -> dict[str, Any]:
         specs = [
             BatchFactSpec(
@@ -384,12 +408,18 @@ def build_default_tool_registry(
             )
             for idx, f in enumerate(facts)
         ]
-        res = apply_memit_mass_batch(
+        res = apply_eamit_batch(
             workspace,
             target_tensors,
             specs,
             lambda_cov=float(lambda_cov),
             apply_fisher_guard=True,
+            align_config=EamitAlignConfig(
+                lambda_kl=float(lambda_kl),
+                lambda_mse=float(lambda_mse),
+                top_m=int(top_m),
+                align_steps=int(align_steps),
+            ),
         )
         return res.to_dict()
 
@@ -446,7 +476,7 @@ def build_default_tool_registry(
         _l3_describe,
         _l3_slice,
         _l3_yaml_plan,
-        _l3_memit,
+        _l3_eamit,
         _l3_sandbox,
         _l3_practice,
         _l3_verify,

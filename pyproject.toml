@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "weightx"
-version = "0.3.0"
-description = "Open-source (GPLv3) Weight-Space Programming harness (DSH-style Desktop + wx/weightx CLI) for safe, declarative, and verified LLM weight surgery."
+version = "0.4.0"
+description = "Open-source (GPLv3) Weight-Space Programming harness — hybrid Rust core (CLI, TOON, YAML plans, I/O) + PyTorch numeric sidecar, with Tauri Desktop. The Python package provides the sidecar numeric library and entry-point shims to the Rust binary."
 readme = "README.md"
 license = "GPL-3.0-or-later"
 license-files = ["LICENSE"]
@@ -19,7 +19,7 @@ keywords = [
     "model-editing",
     "mechanistic-interpretability",
     "tensor-surgery",
-    "memit",
+    "eamit",
     "fisher-information",
     "toon",
 ]
@@ -58,8 +58,8 @@ dev = [
 ]
 
 [project.scripts]
-weightx = "weightx.cli:main"
-wx = "weightx.cli:main"
+weightx = "weightx._launcher:main"
+wx = "weightx._launcher:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

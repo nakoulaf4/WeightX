@@ -1,0 +1,220 @@
+{
+  "model_id": "minillama-demo",
+  "improver_elapsed_s": 0.653,
+  "improver_report": {
+    "model_id": "minillama-demo",
+    "hf_repo_id": "builtin/MiniLlama-4L-64D",
+    "family": "decoder_transformer",
+    "total_params": 214592,
+    "changed_params": 516,
+    "changed_fraction": 0.002405,
+    "initial_metrics": {
+      "perplexity": 35.982,
+      "mean_nll": 3.58302,
+      "top1_accuracy": 0.75,
+      "top5_accuracy": 1.0,
+      "vespasian_score": 0.64749,
+      "logit_kurtosis": -0.1739
+    },
+    "final_metrics": {
+      "perplexity": 35.3886,
+      "mean_nll": 3.56639,
+      "top1_accuracy": 1.0,
+      "top5_accuracy": 1.0,
+      "vespasian_score": 0.823,
+      "logit_kurtosis": -0.1694
+    },
+    "ppl_reduction_pct": 1.65,
+    "top1_accuracy_gain_pct": 25.0,
+    "vespasian_gain": 0.17551,
+    "kci_gini": 0.4142,
+    "bottleneck_layers": [],
+    "stages": [
+      {
+        "stage_name": "Stage 1: BrainSurgery-WX Outlier & Spectral Repair",
+        "description": "Rescaled outlier rows and capped spectral spikes in model.layers.2.mlp.down_proj.weight",
+        "committed": true,
+        "pre_perplexity": 35.98198163130353,
+        "post_perplexity": 35.38856854189671,
+        "pre_top1_acc": 0.75,
+        "post_top1_acc": 1.0,
+        "vespasian_verdict": "ACCEPTED & COMMITTED: held-out score improved 0.53379 -> 0.70878 (+0.17500), KL drift=0.0166 <= 5.0",
+        "yaml_plan_used": "transforms:\n  - assert:\n      all:\n        - exists: { of: 'model.layers.2.mlp.down_proj.weight' }\n        - shape: { of: 'model.layers.2.mlp.down_proj.weight', is: [64, 172] }\n        - dtype: { of: 'model.layers.2.mlp.down_proj.weight', is: 'float32' }\n        - finite: { of: 'model.layers.2.mlp.down_proj.weight' }\n  - rescale_outlier_rows_:\n      target: 'model.layers.2.mlp.down_proj.weight'\n      min_ratio: 2.2\n  - spectral_norm_cap_:\n      target: 'model.layers.2.mlp.down_proj.weight'\n      max_median_ratio: 3.5\n  - assert:\n      finite: { of: 'model.layers.2.mlp.down_proj.weight' }\n"
+      },
+      {
+        "stage_name": "Stage 2: Closed-Form Subspace Ridge Calibration",
+        "description": "Aligned output subspace on lm_head.weight with Fisher guard",
+        "committed": false,
+        "pre_perplexity": 35.38856854189671,
+        "post_perplexity": 35.38856854189671,
+        "pre_top1_acc": 1.0,
+        "post_top1_acc": 1.0,
+        "vespasian_verdict": "REJECTED: held-out score 0.57762 did not improve over best 0.70878 (delta=-0.13116, required >= +0.0005) -> AUTOMATIC ROLLBACK to vespasian_best.",
+        "yaml_plan_used": null
+      }
+    ],
+    "saved_checkpoint_path": null
+  },
+  "skills": [
+    {
+      "skill_id": "outlier-repair",
+      "accepted": true,
+      "elapsed_s": 0.074,
+      "metrics": {
+        "baseline_score": 0.53379,
+        "held_out_score": 0.70878,
+        "delta": 0.175,
+        "kl_drift": 0.01655,
+        "outliers_found": 1
+      },
+      "summary": "ACCEPTED & COMMITTED: held-out score improved 0.53379 -> 0.70878 (+0.17500), KL drift=0.0166 <= 2.0"
+    },
+    {
+      "skill_id": "spectral-denoise",
+      "accepted": true,
+      "elapsed_s": 0.254,
+      "metrics": {
+        "baseline_score": 0.53379,
+        "best_score": 0.70878,
+        "improvement": 0.175
+      },
+      "summary": "Перплексия оптимизирована; held-out score 0.53379 → 0.70878."
+    },
+    {
+      "skill_id": "coding-boost",
+      "accepted": true,
+      "elapsed_s": 0.077,
+      "metrics": {
+        "baseline_score": 0.53379,
+        "held_out_score": 0.70878,
+        "delta": 0.175,
+        "kl_drift": 0.01655
+      },
+      "summary": "ACCEPTED & COMMITTED: held-out score improved 0.53379 -> 0.70878 (+0.17500), KL drift=0.0166 <= 2.0"
+    },
+    {
+      "skill_id": "memory-slim",
+      "accepted": true,
+      "elapsed_s": 0.079,
+      "metrics": {
+        "baseline_score": 0.53379,
+        "held_out_score": 0.70874,
+        "delta": 0.17495,
+        "kl_drift": 0.01675,
+        "target_tensor": "model.layers.2.mlp.down_proj.weight",
+        "original_rank": 64,
+        "compressed_rank": 48,
+        "rank_reduction_pct": 25.0,
+        "original_elements": 11008,
+        "low_rank_elements": 11328
+      },
+      "summary": "ACCEPTED & COMMITTED: held-out score improved 0.53379 -> 0.70874 (+0.17495), KL drift=0.0167 <= 2.0"
+    },
+    {
+      "skill_id": "eamit-facts",
+      "accepted": false,
+      "elapsed_s": 0.723,
+      "metrics": {
+        "baseline_score": 0.53379,
+        "held_out_score": 0.48999,
+        "delta": -0.04379,
+        "kl_drift": 0.00098,
+        "facts_injected": 32,
+        "target_layers": 3,
+        "gini_kci": 0.4142,
+        "max_l2_delta": 2.57887,
+        "error_reduction_pct": 96.22,
+        "alignment_kl_before": 1.93642,
+        "alignment_kl_after": 1.26994,
+        "alignment_top_m_mse_after": 0.09109
+      },
+      "summary": "REJECTED: held-out score 0.48999 did not improve over best 0.53379 (delta=-0.04379, required >= +0.01) -> AUTOMATIC ROLLBACK to vespasian_best."
+    },
+    {
+      "skill_id": "knowledge-map",
+      "accepted": true,
+      "elapsed_s": 0.081,
+      "metrics": {
+        "global_gini_kci": 0.4142,
+        "factual_layers": [
+          0,
+          2,
+          3
+        ],
+        "syntactic_layers": [
+          0,
+          2,
+          3
+        ],
+        "concentration_regime": "moderate_localized"
+      },
+      "summary": "Карта знаний построена: Gini KCI = 0.4142, пиковые слои: [0, 2, 3]."
+    },
+    {
+      "skill_id": "abliterate",
+      "accepted": false,
+      "elapsed_s": 0.02,
+      "metrics": {
+        "baseline_score": 0.53379,
+        "held_out_score": 0.53379,
+        "delta": 0.0,
+        "kl_drift": 0.0,
+        "target_tensor": "model.layers.3.mlp.down_proj.weight",
+        "projection_alpha": 0.15
+      },
+      "summary": "REJECTED: held-out score 0.53379 did not improve over best 0.53379 (delta=+0.00000, required >= +0.01) -> AUTOMATIC ROLLBACK to vespasian_best."
+    },
+    {
+      "skill_id": "vespasian-guard",
+      "accepted": true,
+      "elapsed_s": 0.015,
+      "metrics": {
+        "tested_tensor": "model.layers.0.self_attn.q_proj.weight",
+        "rolled_back": true,
+        "guard_passed": true,
+        "corrupted_score": 0.48985,
+        "restored_score": 0.53379,
+        "bit_exact_max_diff": 0.0
+      },
+      "summary": "Защита Vespasian успешно перехватила деградацию и выполнила побитовый откат (`max_abs_diff = 0.0e+00`)."
+    }
+  ],
+  "eamit_scaling": [
+    {
+      "num_facts": 10,
+      "elapsed_ms": 555.93,
+      "pre_edit_mse": 0.078235,
+      "post_edit_mse": 0.00102,
+      "error_reduction_pct": 98.7,
+      "pre_alignment_kl": 0.82781,
+      "post_alignment_kl": 0.24879
+    },
+    {
+      "num_facts": 50,
+      "elapsed_ms": 609.26,
+      "pre_edit_mse": 0.085635,
+      "post_edit_mse": 0.000973,
+      "error_reduction_pct": 98.86,
+      "pre_alignment_kl": 1.09154,
+      "post_alignment_kl": 0.62174
+    },
+    {
+      "num_facts": 100,
+      "elapsed_ms": 590.66,
+      "pre_edit_mse": 0.089673,
+      "post_edit_mse": 0.000912,
+      "error_reduction_pct": 98.98,
+      "pre_alignment_kl": 1.16228,
+      "post_alignment_kl": 0.7811
+    },
+    {
+      "num_facts": 250,
+      "elapsed_ms": 1548.47,
+      "pre_edit_mse": 0.087029,
+      "post_edit_mse": 0.020273,
+      "error_reduction_pct": 76.71,
+      "pre_alignment_kl": 1.26108,
+      "post_alignment_kl": 0.95787
+    }
+  ]
+}
