@@ -11,7 +11,7 @@
 [![Python 3.10+](https://img.shields.io/badge/sidecar-Python_3.10+-blue.svg)](https://www.python.org/downloads/)
 [![Version](https://img.shields.io/badge/release-v0.4.0-7aaaff.svg)](https://github.com/nakoulaf4/WeightX/releases)
 [![Tests](https://img.shields.io/badge/tests-27_Rust_+_26_pytest-4ed17e.svg)](#testing)
-[![UI Style](https://img.shields.io/badge/UI-DSH_Minimalist-151517.svg)](#desktop-app--screenshots)
+[![Desktop](https://img.shields.io/badge/desktop-Tauri_2-7aaaff.svg)](#desktop-app--screenshots)
 
 </div>
 
@@ -25,15 +25,21 @@
 
 ## Desktop App & Screenshots
 
-WeightX Desktop follows a minimalist dark canvas (`#151517` base, `#1B1B1C` collapsible sidebar, `#2C2C2E` rounded composer card, `#F9FAFB` crisp send trigger) designed for distraction-free weight surgery with on-demand inspection drawers and ultra-compact one-click **Skill Pills**.
+WeightX Desktop (`v0.4.0`, native **Rust + Tauri 2**) ships with the **Atlas** dark canvas (`#0b0d11` base, `#13161d` surface cards, `#7aaaff` focal accents, 12 switchable themes including `Графит`, `AMOLED`, `Полярный`, `Неон`, `Аметист`), an interactive neural-network background, 9 workspace views (`Чат`, `Тензоры`, `Диагностика`, `YAML-план`, `История`, `Модели`, `Провайдер`, `Настройки`, `Горячие клавиши`), Command Palette (`Ctrl+K`), live Hugging Face Hub catalog, and a **13-metric L2 Inspector (`Ctrl+I`)**.
 
 <div align="center">
 
-### Minimalist Home & Skill Pills
+### Workspace Home & One-Click Skill Pills
 ![WeightX Desktop Home](assets/weightx_desktop_preview.png)
 
-### Active Weight-Surgery Session & Inspector
+### Active Weight-Surgery Session & Vespasian Commit
 ![WeightX Active Session](assets/weightx_chat_preview.png)
+
+### L2 AutoArch Diagnostics, Knowledge Map & 13-Metric Layer Inspector
+![WeightX L2 Diagnostics and Inspector](assets/weightx_diagnostics_preview.png)
+
+### Hugging Face & Local Model Catalog (RAM/Disk Budget Guard)
+![WeightX Model Catalog](assets/weightx_models_preview.png)
 
 </div>
 
@@ -117,7 +123,7 @@ All improvements are evaluated strictly on **disjoint held-out test splits** (`W
 Both `wx` and `weightx` resolve identically and **ignore letter case** (`wx`, `WX`, `Wx`, `weightx`, `WeightX`, `WEIGHTX`), as do all subcommands and skill names:
 
 ```powershell
-# Launch interactive DSH-styled CLI REPL
+# Launch interactive WeightX CLI REPL
 wx
 WEIGHTX
 

@@ -135,20 +135,33 @@ def run_git(git_exe: str, *args: str, redact: str | None = None, check: bool = T
 
 
 def ensure_github_repo(client: httpx.Client) -> dict[str, Any]:
-    """Fetch `nakoulaf4/WeightX` or create it if it does not exist yet."""
+    """Fetch `nakoulaf4/WeightX` (or create it) and keep description/topics current."""
+    desired_desc = (
+        "WeightX: Open-source Weight-Space Programming (WSP) harness in Rust & Tauri 2 + "
+        "PyTorch sidecar for safe, declarative and verified LLM weight surgery."
+    )
+    desired_topics = [
+        "rust",
+        "tauri",
+        "pytorch",
+        "llm",
+        "weight-editing",
+        "model-editing",
+        "eamit",
+        "mechanistic-interpretability",
+    ]
     r = client.get(f"{GITHUB_API}/repos/{FULL_REPO}")
     if r.status_code == 200:
         print(f"[publish] Using existing repository: https://github.com/{FULL_REPO}")
+        client.patch(f"{GITHUB_API}/repos/{FULL_REPO}", json={"description": desired_desc})
+        client.put(f"{GITHUB_API}/repos/{FULL_REPO}/topics", json={"names": desired_topics})
         return r.json()
     if r.status_code != 404:
         raise RuntimeError(f"Failed to query {FULL_REPO}: {r.status_code} {r.text}")
 
     payload = {
         "name": REPO_NAME,
-        "description": (
-            "WeightX: Open-source Weight-Space Programming (WSP) harness with DSH minimalist UI, "
-            "case-insensitive wx/weightx CLI, 8 built-in WSP skills, and Vespasian rollback."
-        ),
+        "description": desired_desc,
         "private": False,
         "has_issues": True,
         "has_wiki": False,
@@ -156,6 +169,7 @@ def ensure_github_repo(client: httpx.Client) -> dict[str, Any]:
     created = client.post(f"{GITHUB_API}/user/repos", json=payload)
     if created.status_code not in (200, 201):
         raise RuntimeError(f"Failed to create repository {FULL_REPO}: {created.status_code} {created.text}")
+    client.put(f"{GITHUB_API}/repos/{FULL_REPO}/topics", json={"names": desired_topics})
     print(f"[publish] Created repository: https://github.com/{FULL_REPO}")
     return created.json()
 

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-//! Interactive WeightX CLI REPL — DSH minimalist terminal aesthetic.
+//! Interactive WeightX CLI REPL — minimalist terminal workspace.
 
 use std::io::{BufRead, IsTerminal, Write};
 use std::sync::atomic::{AtomicBool, Ordering};
